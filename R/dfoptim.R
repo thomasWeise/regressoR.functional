@@ -7,21 +7,23 @@
 #' @description Apply twi derivative-free algorithms, namely Hook-Jeeves and
 #'   Nelder-Mead, to fit a functional model.
 #'
-#' @param metric an instance of \code{regressoR.quality::RegressionQualityMetric}
+#' @param metric an instance of
+#'   \code{regressoR.quality::RegressionQualityMetric}
 #' @param model an instance of \code{\link{FunctionalModel}}
 #' @param par the initial starting point
-#' @return On success, an instance of
-#'   \code{\link{FittedFunctionalModel}}. \code{NULL} on failure.
+#' @return On success, an instance of \code{\link{FittedFunctionalModel}}.
+#'   \code{NULL} on failure.
 #' @importFrom dfoptim hjk nmk
 #' @importFrom learnerSelectoR learning.checkQuality
 #' @importClassesFrom regressoR.quality RegressionQualityMetric
-#' @importFrom regressoR.functional.models par.estimate par.check
-#' @export model.fit.dfoptim
-model.fit.dfoptim <- function(metric, model, par=NULL) {
+#' @importFrom regressoR.functional.models FunctionalModel.par.estimate
+#'   FunctionalModel.par.check
+#' @export FunctionalModel.fit.dfoptim
+FunctionalModel.fit.dfoptim <- function(metric, model, par=NULL) {
   if(base::is.null(metric) || base::is.null(model) ) { return(NULL); }
 
   if(base::is.null(par)) {
-    par <- regressoR.functional.models::par.estimate(model, metric);
+    par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric);
   }
 
   limits <- .fix.boundaries(model);
@@ -64,7 +66,7 @@ model.fit.dfoptim <- function(metric, model, par=NULL) {
       result1q <- +Inf;
     } else {
       result1par <- result1$par;
-      if(!(regressoR.functional.models::par.check(model, result1par))) {
+      if(!(regressoR.functional.models::FunctionalModel.par.check(model, result1par))) {
         result1par <- NULL;
         result1q <- +Inf;
       } else {
@@ -81,7 +83,7 @@ model.fit.dfoptim <- function(metric, model, par=NULL) {
       result2q <- +Inf;
     } else {
       result2par <- result2$par;
-      if(!(regressoR.functional.models::par.check(model, result2par))) {
+      if(!(regressoR.functional.models::FunctionalModel.par.check(model, result2par))) {
         result2par <- NULL;
         result2q <- +Inf;
       } else {

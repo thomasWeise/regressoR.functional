@@ -1,5 +1,12 @@
 #' @title A Fitted Functional Model
+#'
 #' @description This class holds a fully parameterized, fitted functional model.
+#' Instances of this class are typically the result of a model fitting approach,
+#' i.e., the application of an algorithm which accepts an instance of
+#' \code{\link{FunctionalModel}} and an instance of
+#' \code{\link{RegressionQualityMetric}} and finds the parameters for the
+#' functional model which minimize the return value of the regression quality
+#' metric.
 #'
 #' @slot model the model Blueprint
 #' @slot par the model parameters
@@ -7,7 +14,7 @@
 #' @importFrom methods setClass representation is validObject
 #' @importClassesFrom regressoR.functional.models FunctionalModel
 #' @importClassesFrom regressoR.base FittedModel
-#' @importFrom regressoR.functional.models par.check
+#' @importFrom regressoR.functional.models FunctionalModel.par.check
 #' @seealso FittedFunctionalModel.new
 FittedFunctionalModel <- methods::setClass(
   Class = "FittedFunctionalModel",
@@ -20,7 +27,7 @@ FittedFunctionalModel <- methods::setClass(
       return("Model model must be properly defined.");
     }
     methods::validObject(object@model);
-    if(!(par.check(object@model, object@par))) {
+    if(!(FunctionalModel.par.check(object@model, object@par))) {
       return("Model parameters cannot be null and must match the number of parameters and constraints specified in model.");
     }
     if(!(object@size >= object@model@paramCount)) {

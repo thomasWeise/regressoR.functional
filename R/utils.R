@@ -1,9 +1,4 @@
-# Either a \code{function} or \code{NULL}
-#' @importFrom methods setClassUnion
-setClassUnion(".dataModeleR.functionOrNULL", c("function","NULL"))
-# Either a \code{numeric} \code{vector} or \code{NULL}
-#' @importFrom methods setClassUnion
-setClassUnion(".dataModeleR.vectorOrNULL", c("numeric","NULL"))
+# Some internal, general utils.
 
 # ignore the argument
 # @param e ignored

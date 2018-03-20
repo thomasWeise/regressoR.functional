@@ -1,8 +1,8 @@
 library("regressoR.functional")
-context("model.fit.defaultFitters")
+context("FunctionalModel.fit.defaultFitters")
 
-test_that("Test model.fit.defaultFitters plain", {
-  list <- model.fit.defaultFitters();
+test_that("Test FunctionalModel.fit.defaultFitters plain", {
+  list <- FunctionalModel.fit.defaultFitters();
   expect_true(!base::is.null(list));
   expect_true(length(list) > 0);
   for(index in 1:length(list)) {
@@ -21,13 +21,13 @@ test_that("Test model.fit.defaultFitters plain", {
 
 
 
-test_that("Test model.fit.defaultFitters combos", {
+test_that("Test FunctionalModel.fit.defaultFitters combos", {
   params <- c(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L);
   sizes  <- c(1L:10L, 2L^(1L:20L), 33L*1L:100L);
 
   for(param in params) {
     for(size in sizes) {
-      list <- model.fit.defaultFitters();
+      list <- FunctionalModel.fit.defaultFitters();
       expect_true(!base::is.null(list));
       expect_true(length(list) > 0);
       for(index in 1:length(list)) {

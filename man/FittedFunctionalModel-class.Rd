@@ -7,6 +7,12 @@
 \title{A Fitted Functional Model}
 \description{
 This class holds a fully parameterized, fitted functional model.
+Instances of this class are typically the result of a model fitting approach,
+i.e., the application of an algorithm which accepts an instance of
+\code{\link{FunctionalModel}} and an instance of
+\code{\link{RegressionQualityMetric}} and finds the parameters for the
+functional model which minimize the return value of the regression quality
+metric.
 }
 \section{Slots}{
 

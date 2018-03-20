@@ -6,21 +6,23 @@
 #' @description Apply the Differential Evolution (DE) algorithm to fit a
 #'   functional model.
 #'
-#' @param metric an instance of \code{regressoR.quality::RegressionQualityMetric}
+#' @param metric an instance of
+#'   \code{regressoR.quality::RegressionQualityMetric}
 #' @param model an instance of \code{\link{FunctionalModel}}
 #' @param par the initial starting point
-#' @return On success, an instance of
-#'   \code{\link{FittedFunctionalModel}}. \code{NULL} on failure.
+#' @return On success, an instance of \code{\link{FittedFunctionalModel}}.
+#'   \code{NULL} on failure.
 #' @importFrom DEoptim DEoptim DEoptim.control
 #' @importFrom learnerSelectoR learning.checkQuality
 #' @importClassesFrom regressoR.quality RegressionQualityMetric
-#' @importFrom regressoR.functional.models par.estimate par.check
-#' @export model.fit.de
-model.fit.de <- function(metric, model, par=NULL) {
+#' @importFrom regressoR.functional.models FunctionalModel.par.estimate
+#'   FunctionalModel.par.check
+#' @export FunctionalModel.fit.de
+FunctionalModel.fit.de <- function(metric, model, par=NULL) {
   if(base::is.null(metric) || base::is.null(model) ) { return(NULL); }
 
   if(base::is.null(par)) {
-    par <- regressoR.functional.models::par.estimate(model, metric);
+    par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric);
   }
 
   fn <- function(par) metric@quality(model@f, par);
@@ -52,7 +54,7 @@ model.fit.de <- function(metric, model, par=NULL) {
     if(base::is.null(result) || (base::length(result) < 2)) { return(NULL); }
     result <- result[[1]];
     if(base::is.null(result) ) { return(NULL); }
-    if(!(regressoR.functional.models::par.check(model, result$bestmem))) { return(NULL); }
+    if(!(regressoR.functional.models::FunctionalModel.par.check(model, result$bestmem))) { return(NULL); }
     if(!(learnerSelectoR::learning.checkQuality(result$bestval))) { return(NULL); }
     return(FittedFunctionalModel.new(model, result$bestmem, result$bestval));
   });

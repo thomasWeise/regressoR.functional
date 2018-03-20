@@ -2,26 +2,27 @@
 #' @include utils.R
 #' @include tools.R
 
-
 #' @title Use Powell's BOBYQA Approach to Optimize the Parameters
 #'
 #' @description Apply Powell's BOBYQA Approach to fit a functional model.
 #'
-#' @param metric an instance of \code{regressoR.quality::RegressionQualityMetric}
+#' @param metric an instance of
+#'   \code{regressoR.quality::RegressionQualityMetric}
 #' @param model an instance of \code{\link{FunctionalModel}}
 #' @param par the initial starting point
-#' @return On success, an instance of
-#'   \code{\link{FittedFunctionalModel}}. \code{NULL} on failure.
+#' @return On success, an instance of \code{\link{FittedFunctionalModel}}.
+#'   \code{NULL} on failure.
 #' @importFrom minqa bobyqa newuoa
 #' @importFrom learnerSelectoR learning.checkQuality
 #' @importClassesFrom regressoR.quality RegressionQualityMetric
-#' @importFrom regressoR.functional.models par.estimate par.check
-#' @export model.fit.minqa
-model.fit.minqa <- function(metric, model, par=NULL) {
+#' @importFrom regressoR.functional.models FunctionalModel.par.estimate
+#'   FunctionalModel.par.check
+#' @export FunctionalModel.fit.minqa
+FunctionalModel.fit.minqa <- function(metric, model, par=NULL) {
   if(base::is.null(metric) || base::is.null(model) ) { return(NULL); }
 
   if(base::is.null(par)) {
-    par <- regressoR.functional.models::par.estimate(model, metric);
+    par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric);
   }
 
   fn <- function(par) metric@quality(model@f, par);
@@ -56,7 +57,7 @@ model.fit.minqa <- function(metric, model, par=NULL) {
 
     if(!base::is.null(result)) {
       resultpar <- result$par;
-      if(regressoR.functional.models::par.check(model, resultpar)) {
+      if(regressoR.functional.models::FunctionalModel.par.check(model, resultpar)) {
         resultq <- result$fval;
         if(learnerSelectoR::learning.checkQuality(resultq)) {
           return(FittedFunctionalModel.new(model, resultpar, resultq));
@@ -67,7 +68,7 @@ model.fit.minqa <- function(metric, model, par=NULL) {
     result <- minqa::newuoa(par=par, fn=fn);
     if(!base::is.null(result)) {
       resultpar <- result$par;
-      if(regressoR.functional.models::par.check(model, resultpar)) {
+      if(regressoR.functional.models::FunctionalModel.par.check(model, resultpar)) {
         resultq <- result$fval;
         if(learnerSelectoR::learning.checkQuality(resultq)) {
           return(FittedFunctionalModel.new(model, resultpar, resultq));

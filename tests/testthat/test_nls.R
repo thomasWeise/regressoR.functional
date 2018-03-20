@@ -1,17 +1,17 @@
 library("regressoR.functional")
-context("model.fit.nls")
+context("FunctionalModel.fit.nls")
 
-test_that("Test model.fit.nls", {
+test_that("Test FunctionalModel.fit.nls", {
 
   x <- rnorm(10);
   params <- c(5, 7);
   func <- function(x) { params[1] + params[2]*x };
   y <- func(x);
 
-  functionalModel <- regressoR.functional.models::linear();
-  metric <- regressoR.quality::default(x, y)
+  functionalModel <- regressoR.functional.models::FunctionalModel.linear();
+  metric <- regressoR.quality::RegressionQualityMetric.default(x, y)
   start <- functionalModel@estimator(x, y)
-  result <- model.fit.nls(metric, functionalModel, start);
+  result <- FunctionalModel.fit.nls(metric, functionalModel, start);
   if(!is.null(result)) {
     expect_is(result, "FittedFunctionalModel");
     expect_equal(result@par, params);
@@ -21,18 +21,18 @@ test_that("Test model.fit.nls", {
   }
 
   yr <- y+0.01*rnorm(length(y))
-  metricr <- regressoR.quality::default(x, yr);
+  metricr <- regressoR.quality::RegressionQualityMetric.default(x, yr);
   startr <- functionalModel@estimator(x, yr);
-  result <- model.fit.nls(metricr, functionalModel, startr);
+  result <- FunctionalModel.fit.nls(metricr, functionalModel, startr);
   expect_identical(is.null(result), FALSE);
   expect_is(result, "FittedFunctionalModel");
   expect_identical( sum((result@par-params)^2) < 0.1, TRUE);
   expect_identical(result@quality < 0.1, TRUE);
   expect_identical(result@quality, metricr@quality(functionalModel@f, result@par));
 
-  functionalModel <- regressoR.functional.models::quadratic();
+  functionalModel <- regressoR.functional.models::FunctionalModel.quadratic();
   startr <- functionalModel@estimator(x, yr);
-  result <- model.fit.nls(metricr, functionalModel, startr);
+  result <- FunctionalModel.fit.nls(metricr, functionalModel, startr);
   if(!is.null(result)) {
     expect_identical(is.null(result), FALSE);
     expect_is(result, "FittedFunctionalModel");

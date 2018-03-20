@@ -2,7 +2,7 @@ library("regressoR.functional")
 context("TransformedFittedFunctionalModel")
 
 test_that("Test TransformedFittedFunctionalModel constructor", {
-  model <- regressoR.functional.models::quadratic();
+  model <- regressoR.functional.models::FunctionalModel.quadratic();
   par <- c(3, -4, 2)
   f <- function(x) model@f(x, par)
   t.x <- function(x) 3*x+2;
@@ -26,7 +26,7 @@ test_that("Test TransformedFittedFunctionalModel constructor", {
 })
 
 test_that("Test FittedFunctionalModel constructor with error", {
-  model <- regressoR.functional.models::quadratic();
+  model <- regressoR.functional.models::FunctionalModel.quadratic();
   par <- c(3, -4, 2)
   t.x <- function(x) 3*x+2;
   t.y <- function(x) 0.2*(x-3.1)
@@ -43,7 +43,7 @@ test_that("Test FittedFunctionalModel constructor with error", {
 })
 
 test_that("Test FittedFunctionalModel.new", {
-  model <- regressoR.functional.models::quadratic();
+  model <- regressoR.functional.models::FunctionalModel.quadratic();
   par <- c(3, -4, 2)
   t.x <- function(x) 3*x+2;
   t.y <- function(x) 0.2*(x-3.1)
@@ -66,7 +66,7 @@ test_that("Test FittedFunctionalModel.new", {
 
 
 test_that("Test TransformedFittedFunctionalModel.new with error", {
-  model <- regressoR.functional.models::quadratic();
+  model <- regressoR.functional.models::FunctionalModel.quadratic();
   par <- c(3, -4, 2)
   t.x <- function(x) 3*x+2;
   t.y <- function(x) 0.2*(x-3.1)
@@ -81,7 +81,7 @@ test_that("Test TransformedFittedFunctionalModel.new with error", {
 
 
 test_that("Test learning.Result.finalize", {
-  model <- regressoR.functional.models::quadratic();
+  model <- regressoR.functional.models::FunctionalModel.quadratic();
   par <- c(3, -4, 2)
   t.x <- function(x) 3*x+2;
   t.y <- function(x) 0.2*(x-3.1)

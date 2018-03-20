@@ -8,18 +8,18 @@
 
 # The internal least squares approach: nls.lm with fallback to nls
 .fitters.nls <- function(metric, model, par=NULL) {
-  result <- model.fit.nlslm(metric, model, par);
+  result <- FunctionalModel.fit.nlslm(metric, model, par);
   if(base::is.null(result)) {
-    return(model.fit.nls(metric, model, par));
+    return(FunctionalModel.fit.nls(metric, model, par));
   }
   return(result);
 }
 
 # The internal population-based approach: cma-es with fallback to de
 .fitters.cmaesde <- function(metric, model, par=NULL) {
-  result <- model.fit.cmaes(metric, model, par);
+  result <- FunctionalModel.fit.cmaes(metric, model, par);
   if(base::is.null(result)) {
-    return(model.fit.de(metric, model, par));
+    return(FunctionalModel.fit.de(metric, model, par));
   }
   return(result);
 }
@@ -27,9 +27,9 @@
 
 # The internal local search-like approach: minqa with fallback to df
 .fitters.minqadfoptim <- function(metric, model, par=NULL) {
-  result <- model.fit.minqa(metric, model, par);
+  result <- FunctionalModel.fit.minqa(metric, model, par);
   if(base::is.null(result)) {
-    return(model.fit.dfoptim(metric, model, par));
+    return(FunctionalModel.fit.dfoptim(metric, model, par));
   }
   return(result);
 }
@@ -84,13 +84,14 @@
 # create the cache
 .fitters.cache <- base::new.env();
 
-#' @title Get the Vector of Default Functional Model Fitters
-#' @description Well, get the Vector of Default Functional Model Fitters.
+#' @title Get the List of Default Functional Model Fitting Algorithms
+#' @description Well, get the List of Default Functional Model Fitters.
 #' @param dataSize the size of the data, assumed to be {@code 1000} if unknown
-#' @param paramCount the number of model parameters, assumed to be {@code 4} if unknown
-#' @return the Vector of Default Functional Model Fitters
-#' @export model.fit.defaultFitters
-model.fit.defaultFitters <- function(dataSize = 1000, paramCount = 4) {
+#' @param paramCount the number of model parameters, assumed to be {@code 4} if
+#'   unknown
+#' @return the List of Default Functional Model Fitters
+#' @export FunctionalModel.fit.defaultFitters
+FunctionalModel.fit.defaultFitters <- function(dataSize = 1000, paramCount = 4) {
   usage <- .fitters.available;
 
   complexity <- (dataSize * paramCount * paramCount);
@@ -174,22 +175,22 @@ model.fit.defaultFitters <- function(dataSize = 1000, paramCount = 4) {
       result[[base::length(result) + 1L]] <- .fitters.cmaesde;
     }
     if(base::bitwAnd(usage, .key.nlslm) == .key.nlslm) {
-      result[[base::length(result) + 1L]] <- model.fit.nlslm;
+      result[[base::length(result) + 1L]] <- FunctionalModel.fit.nlslm;
     }
     if(base::bitwAnd(usage, .key.minqa) == .key.minqa) {
-      result[[base::length(result) + 1L]] <- model.fit.minqa;
+      result[[base::length(result) + 1L]] <- FunctionalModel.fit.minqa;
     }
     if(base::bitwAnd(usage, .key.cmaes) == .key.cmaes) {
-      result[[base::length(result) + 1L]] <- model.fit.cmaes;
+      result[[base::length(result) + 1L]] <- FunctionalModel.fit.cmaes;
     }
     if(base::bitwAnd(usage, .key.nls) == .key.nls) {
-      result[[base::length(result) + 1L]] <- model.fit.nls;
+      result[[base::length(result) + 1L]] <- FunctionalModel.fit.nls;
     }
     if(base::bitwAnd(usage, .key.dfoptim) == .key.dfoptim) {
-      result[[base::length(result) + 1L]] <- model.fit.dfoptim;
+      result[[base::length(result) + 1L]] <- FunctionalModel.fit.dfoptim;
     }
     if(base::bitwAnd(usage, .key.de) == .key.de) {
-      result[[base::length(result) + 1L]] <- model.fit.de;
+      result[[base::length(result) + 1L]] <- FunctionalModel.fit.de;
     }
     result <- base::unlist(result);
     base::assign(x=usage.str, value=result, pos=.fitters.cache);

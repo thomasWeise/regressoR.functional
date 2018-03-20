@@ -1,3 +1,5 @@
+# In this file we have some internal tools.
+
 # Fix up some boundaries
 .fix.boundaries <- function(functionalModel) {
   lower <- functionalModel@paramLower;
@@ -35,7 +37,7 @@
 
 # Make an initial population of size \code{NP}
 #' @importFrom stats rnorm runif
-#' @importFrom regressoR.functional.models par.fix
+#' @importFrom regressoR.functional.models FunctionalModel.par.fix
 .make.initial.pop <- function(par, lower, upper, NP, paramCount) {
 
   # Let's first randomly sample the current population based on the par vector
@@ -54,7 +56,7 @@
   if(!(base::is.null(lower) && base::is.null(upper))) {
     # Yes we do
     for(i in 1:NP) {
-      pop[i,] <- par.fix(pop[i, ], lower, upper, paramCount);
+      pop[i,] <- FunctionalModel.par.fix(pop[i, ], lower, upper, paramCount);
     }
   }
 

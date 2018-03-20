@@ -1,11 +1,16 @@
 #' @include FittedFunctionalModel.R
 
 #' @title A Functional Model Fitted on Transformed Data
-#' @description This class holds a fully parameterized, functional model
-#' which has been been fitted to transformed data.
+#' @description This class holds a fully parameterized, functional model which
+#' has been been fitted to transformed data. Different from the normal instances
+#' of \code{\link{FunctionalModel}}, it also holds information about the
+#' transformation which has been applied to the data before the model was
+#' fitted.
 #'
-#' @slot transform.x the input transformation to be applied to all \code{x} coordinates before feeding them to the parameterized blueprint function
-#' @slot transform.y the output transformation to be applied to all results of the blueprint function
+#' @slot transform.x the input transformation to be applied to all \code{x}
+#'   coordinates before feeding them to the parameterized blueprint function
+#' @slot transform.y the output transformation to be applied to all results of
+#'   the blueprint function
 #' @exportClass TransformedFittedFunctionalModel
 #' @importFrom methods setClass representation
 #' @seealso TransformedFittedFunctionalModel.new

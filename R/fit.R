@@ -6,16 +6,16 @@
 #' @title Fit the Given Model Blueprint to the Specified Data
 #'
 #' @description Apply a set of fitters iteratively to fit the specified model to
-#'   the given data. First, we generate a starting guess about the
-#'   parameterization via \code{\link{par.estimate}} (or accept it
-#'   via the parameter \code{par}). From then on, we apply the different
-#'   function fitters one by one. All the fitters who have not produced the
-#'   current best solution are applied again, to the now-best guess. However, we
-#'   do not apply the fitters that have produced that very guess in the next
-#'   round. (They may get a chance again in a later turn.) Anyway, this
-#'   procedure is iterated until no improvement can be made anymore. After
-#'   finishing the fitting, we attempt whether rounding the fitted parameters to
-#'   integers can improve the fitting quality.
+#' the given data. First, we generate a starting guess about the
+#' parameterization via \code{\link{FunctionalModel.par.estimate}} (or accept it
+#' via the parameter \code{par}). From then on, we apply the different
+#' function fitters one by one. All the fitters who have not produced the
+#' current best solution are applied again, to the now-best guess. However, we
+#' do not apply the fitters that have produced that very guess in the next
+#' round. (They may get a chance again in a later turn.) Anyway, this
+#' procedure is iterated until no improvement can be made anymore. After
+#' finishing the fitting, we attempt whether rounding the fitted parameters to
+#' integers can improve the fitting quality.
 #'
 #' @param metric an instance of \code{regressoR.quality::RegressionQualityMetric}
 #' @param model an instance of \code{\link{FunctionalModel}}
@@ -23,9 +23,9 @@
 #' @param fitters the fitters
 #' @return On success, an instance of
 #'   \code{\link{FittedFunctionalModel}}. \code{NULL} on failure.
-#' @export model.fit
+#' @export FunctionalModel.fit
 #' @importFrom learnerSelectoR learning.checkQuality
-#' @importFrom regressoR.functional.models par.check par.estimate
+#' @importFrom regressoR.functional.models FunctionalModel.par.check FunctionalModel.par.estimate
 #' @examples
 #'
 #' set.seed(12555)
@@ -34,9 +34,9 @@
 #' par <- c(4, -3, 2);
 #' fx <- function(x) fxpar(x, par);
 #' y <- fx(x);
-#' model <- regressoR.functional.models::quadratic();
-#' metric1 <- regressoR.quality::default(x, y);
-#' res1 <- regressoR.functional::model.fit(metric1, model);
+#' model <- regressoR.functional.models::FunctionalModel.quadratic();
+#' metric1 <- regressoR.quality::RegressionQualityMetric.default(x, y);
+#' res1 <- regressoR.functional::FunctionalModel.fit(metric1, model);
 #' res1@quality
 #' # [1] 0
 #' res1@par
@@ -44,14 +44,14 @@
 #'
 #' xr <- x + 0.1*rnorm(length(x));
 #' yr <- y + 0.1*rnorm(length(y));
-#' metric2 <- regressoR.quality::default(xr, yr);
-#' res2 <- regressoR.functional::model.fit(metric2, model);
+#' metric2 <- regressoR.quality::RegressionQualityMetric.default(xr, yr);
+#' res2 <- regressoR.functional::FunctionalModel.fit(metric2, model);
 #' res2@quality
 #' # [1] 0.2439082
 #' res2@par
 #' # [1]  3.919365 -2.938202  1.998102
-model.fit <- function(metric, model, par=NULL,
-                      fitters = model.fit.defaultFitters(base::length(metric@x), model@paramCount)) {
+FunctionalModel.fit <- function(metric, model, par=NULL,
+                                fitters = FunctionalModel.fit.defaultFitters(base::length(metric@x), model@paramCount)) {
   if(base::is.null(metric) || base::is.null(model)
                            || base::is.null(fitters)) { return(NULL); }
 
@@ -59,8 +59,8 @@ model.fit <- function(metric, model, par=NULL,
   if(fitterCount <= 0L) { return(NULL); }
 
   # get a starting point
-  bestParams <- regressoR.functional.models::par.estimate(model, metric, par);
-  if(regressoR.functional.models::par.check(model, bestParams)) {
+  bestParams <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric, par);
+  if(regressoR.functional.models::FunctionalModel.par.check(model, bestParams)) {
     bestQuality <- metric@quality(model@f, bestParams);
     if(!(learnerSelectoR::learning.checkQuality(bestQuality))) {
       bestQuality <- +Inf;
@@ -111,7 +111,7 @@ model.fit <- function(metric, model, par=NULL,
   }
 
   if(base::is.null(bestResult) &&
-     regressoR.functional.models::par.check(model, bestParams) &&
+     regressoR.functional.models::FunctionalModel.par.check(model, bestParams) &&
      learning.checkQuality(bestQuality)) {
     # strange, ok, let's try to build a new solution
     return(FittedFunctionalModel.new(model, bestParams, bestQuality));
@@ -136,7 +136,7 @@ model.fit <- function(metric, model, par=NULL,
           xr <- base::as.integer(xr);
         }
         bestCopy[i] <- xr;
-        if(regressoR.functional.models::par.check(model, bestCopy)) {
+        if(regressoR.functional.models::FunctionalModel.par.check(model, bestCopy)) {
           test <- metric@quality(model@f, bestCopy);
           if(learnerSelectoR::learning.checkQuality(test) && (test <= bestQuality)) {
             bestQuality <- test;
@@ -161,7 +161,7 @@ model.fit <- function(metric, model, par=NULL,
       improved <- TRUE;
     }
   }
-  if(improved && regressoR.functional.models::par.check(model, bestCopy)) {
+  if(improved && regressoR.functional.models::FunctionalModel.par.check(model, bestCopy)) {
     test <- metric@quality(model@f, bestCopy);
     if(learnerSelectoR::learning.checkQuality(test) && (test <= bestQuality)) {
       bestQuality <- test;

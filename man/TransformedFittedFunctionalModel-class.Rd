@@ -6,15 +6,20 @@
 \alias{TransformedFittedFunctionalModel}
 \title{A Functional Model Fitted on Transformed Data}
 \description{
-This class holds a fully parameterized, functional model
-which has been been fitted to transformed data.
+This class holds a fully parameterized, functional model which
+has been been fitted to transformed data. Different from the normal instances
+of \code{\link{FunctionalModel}}, it also holds information about the
+transformation which has been applied to the data before the model was
+fitted.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{transform.x}}{the input transformation to be applied to all \code{x} coordinates before feeding them to the parameterized blueprint function}
+\item{\code{transform.x}}{the input transformation to be applied to all \code{x}
+coordinates before feeding them to the parameterized blueprint function}
 
-\item{\code{transform.y}}{the output transformation to be applied to all results of the blueprint function}
+\item{\code{transform.y}}{the output transformation to be applied to all results of
+the blueprint function}
 }}
 
 \seealso{

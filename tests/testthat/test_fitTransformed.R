@@ -1,7 +1,7 @@
 library("regressoR.functional")
-context("model.fit.transformed")
+context("FunctionalModel.fit.transformed")
 
-test_that("Test model.fit.transformed", {
+test_that("Test FunctionalModel.fit.transformed", {
   set.seed(234345L)
 
   orig.f.x.par <- function(x, par) exp(par[1] + par[2]*x - par[3]*x*x);
@@ -17,16 +17,16 @@ test_that("Test model.fit.transformed", {
     dataTransformeR::Transformation.log(noisy.y));
   expect_is(transformed.data, "TransformedData2D");
 
-  metric <- regressoR.quality::default(noisy.x, noisy.y);
+  metric <- regressoR.quality::RegressionQualityMetric.default(noisy.x, noisy.y);
   expect_is(metric, "RegressionQualityMetric");
 
-  metric.transformed <- regressoR.quality::default(transformed.data@x@data, transformed.data@y@data);
-  expect_is(transformed.metric, "RegressionQualityMetric");
+  metric.transformed <- regressoR.quality::RegressionQualityMetric.default(transformed.data@x@data, transformed.data@y@data);
+  expect_is(metric.transformed, "RegressionQualityMetric");
 
-  model <- regressoR.functional.models::quadratic();
+  model <- regressoR.functional.models::FunctionalModel.quadratic();
   expect_is(model, "FunctionalModel");
 
-  result <- model.fit.transformed(metric, model,
+  result <- FunctionalModel.fit.transformed(metric, model,
                                   transformed.data@x@transformation,
                                   transformed.data@y@transformation,
                                   metric.transformed);

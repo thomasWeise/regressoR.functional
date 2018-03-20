@@ -1,20 +1,20 @@
 #' @include TransformedFittedFunctionalModel.R
 #' @include defaultFitters.R
 #' @include fit.R
-#'
+
 #' @title Fit the Given Model Blueprint to the Specified Data
 #'
 #' @description Apply a set of fitters iteratively to fit the specified model to
-#'   the given data. First, we generate a starting guess about the
-#'   parameterization via \code{\link{par.estimate}} (or accept it via the
-#'   parameter \code{par}). From then on, we apply the different function
-#'   fitters one by one. All the fitters who have not produced the current best
-#'   solution are applied again, to the now-best guess. However, we do not apply
-#'   the fitters that have produced that very guess in the next round. (They may
-#'   get a chance again in a later turn.) Anyway, this procedure is iterated
-#'   until no improvement can be made anymore. After finishing the fitting, we
-#'   attempt whether rounding the fitted parameters to integers can improve the
-#'   fitting quality.
+#' the given data. First, we generate a starting guess about the
+#' parameterization via \code{\link{FunctionalModel.par.estimate}} (or accept it
+#' via the parameter \code{par}). From then on, we apply the different function
+#' fitters one by one. All the fitters who have not produced the current best
+#' solution are applied again, to the now-best guess. However, we do not apply
+#' the fitters that have produced that very guess in the next round. (They may
+#' get a chance again in a later turn.) Anyway, this procedure is iterated until
+#' no improvement can be made anymore. After finishing the fitting, we attempt
+#' whether rounding the fitted parameters to integers can improve the fitting
+#' quality.
 #'
 #' @param metric an instance of
 #'   \code{regressoR.quality::RegressionQualityMetric}
@@ -28,7 +28,7 @@
 #' @param metric.transformed the transformed metric for the first fitting step
 #' @return On success, an instance of \code{\link{FittedFunctionalModel}}.
 #'   \code{NULL} on failure.
-#' @export model.fit.transformed
+#' @export FunctionalModel.fit.transformed
 #' @importFrom learnerSelectoR learning.checkQuality
 #' @importFrom regressoR.functional.models FunctionalModel.new
 #' @examples
@@ -46,11 +46,11 @@
 #'   dataTransformeR::Transformation.normalize(noisy.x),
 #'   dataTransformeR::Transformation.log(noisy.y));
 #'
-#' metric <- regressoR.quality::default(noisy.x, noisy.y);
-#' metric.transformed <- regressoR.quality::default(transformed.data@x@data,
+#' metric <- regressoR.quality::RegressionQualityMetric.default(noisy.x, noisy.y);
+#' metric.transformed <- regressoR.quality::RegressionQualityMetric.default(transformed.data@x@data,
 #'                                                  transformed.data@y@data);
-#' model <- regressoR.functional.models::quadratic();
-#' result <- model.fit.transformed(metric, model,
+#' model <- regressoR.functional.models::FunctionalModel.quadratic();
+#' result <- FunctionalModel.fit.transformed(metric, model,
 #'                                 transformed.data@x@transformation,
 #'                                 transformed.data@y@transformation,
 #'                                 metric.transformed);
@@ -58,17 +58,17 @@
 #' result.2 <- learnerSelectoR::learning.Result.finalize(result)
 #' plot(noisy.x, noisy.y)
 #' lines(noisy.x, result.2@f(noisy.x), col="red")
-model.fit.transformed <- function(metric, model,
+FunctionalModel.fit.transformed <- function(metric, model,
                                   transformation.x=NULL, transformation.y=NULL,
                                   metric.transformed=NULL,
                                   par=NULL,
-                                  fitters = model.fit.defaultFitters(base::length(metric@x), model@paramCount)) {
+                                  fitters = FunctionalModel.fit.defaultFitters(base::length(metric@x), model@paramCount)) {
 
   f.x.i <- base::is.null(transformation.x);
   f.y.i <- base::is.null(transformation.y);
   if(f.x.i && f.y.i) {
     if(base::is.null(metric.transformed)) {
-      return(model.fit(metric=metric, model=model,par=par, fitters=fitters));
+      return(FunctionalModel.fit(metric=metric, model=model,par=par, fitters=fitters));
     } else {
       base::stop("Transformed metric must be NULL if transformations are both NULL.");
     }
@@ -78,7 +78,7 @@ model.fit.transformed <- function(metric, model,
     }
   }
 
-  result <- model.fit(metric=metric.transformed, model=model, par=par,
+  result <- FunctionalModel.fit(metric=metric.transformed, model=model, par=par,
                       fitters=fitters);
   if(base::is.null(result)) {
     return(NULL);
@@ -125,7 +125,7 @@ model.fit.transformed <- function(metric, model,
                                                                  paramLower=model@paramLower,
                                                                  paramUpper = model@paramUpper);
   # fit the model, starting with the current parameterization
-  result.2 <- model.fit(metric, model.temp, par=result@par, fitters = fitters);
+  result.2 <- FunctionalModel.fit(metric, model.temp, par=result@par, fitters = fitters);
   if(base::is.null(result.2)) {
     # if we failed, let's see whether we can just use the original result
     result@quality <- metric@quality(f.n, result@par);
