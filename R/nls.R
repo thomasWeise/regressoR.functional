@@ -1,0 +1,47 @@
+#' @include FittedFunctionalModel.R
+#' @include utils.R
+#' @include tools.R
+
+#' @title Apply a the Standard Non-Linear Least Squares Approach from Package \code{stats}
+#'
+#' @description Apply the default non-linear least squares algorithm to fit a
+#'   functional model.
+#'
+#' @param metric an instance of \code{regressoR.quality::RegressionQualityMetric}
+#' @param model an instance of \code{\link{FunctionalModel}}
+#' @param par the initial starting point
+#' @return On success, an instance of
+#'   \code{\link{FittedFunctionalModel}}. \code{NULL} on failure.
+#' @seealso \code{\link{nls}}
+#' @importFrom stats nls
+#' @importFrom learnerSelectoR learning.checkQuality
+#' @importClassesFrom regressoR.quality RegressionQualityMetric
+#' @importFrom regressoR.functional.models par.estimate par.check
+#' @export model.fit.nls
+model.fit.nls <- function(metric, model, par=NULL) {
+  if(base::is.null(metric) || base::is.null(model) ||
+     base::is.null(metric@x) || base::is.null(metric@y)) { return(NULL); }
+
+  if(base::is.null(par)) {
+    par <- regressoR.functional.models::par.estimate(model, metric);
+  }
+
+  .ignore.errors({
+    if(base::is.null(metric@weights)) {
+      result <- stats::nls(y ~ model@f(x, par), data=list(x=metric@x, y=metric@y), start=list(par=par));
+    } else {
+      result <- stats::nls(y ~ model@f(x, par), data=list(x=metric@x, y=metric@y),
+                    start=list(par=par), weights=metric@weights);
+    }
+
+    if(base::is.null(result) || base::is.null(result$m) || base::is.null(result$m$getPars)) { return(NULL); }
+    if(!(result$convInfo$isConv)) { return(NULL); }
+    result <- result$m$getPars();
+    if(!(regressoR.functional.models::par.check(model, result))) { return(NULL); }
+    quality <- metric@quality(model@f, result);
+    if(!(learnerSelectoR::learning.checkQuality(quality))) { return(NULL); }
+    return(FittedFunctionalModel.new(model, result, quality));
+  });
+
+  return(NULL);
+}

@@ -1,0 +1,52 @@
+Package: regressoR.functional
+Type: Package
+Title: An R Package for Fitting Functional Models to 2-Dimensional Data
+Version: 0.8.0
+Author: Dr. Thomas Weise <tweise@hfuu.edu.cn>
+Maintainer: Dr. Thomas Weise <tweise@hfuu.edu.cn>
+Description: This package provides methods for fitting a functional model
+    to two-dimensional data. It therefore uses several other packages,
+    both such implementing nonlinear least squares approaches as well
+    as numerical optimization methods. These packages are encapsulated
+    into general interfaces for regression.
+License: LGPL-3
+Encoding: UTF-8
+LazyData: true
+URL: http://www.github.com/thomasWeise/regressoR.functional
+BugReports: http://www.github.com/thomasWeise/regressoR.functional/issues
+Imports: cmaes (>= 1.0.11),
+         dataTransformeR (>= 0.8.4),
+         DEoptim (>= 2.2.4),
+         dfoptim (>= 2017.12.1),
+         functionComposeR (>= 0.8.6),
+         minpack.lm (>= 1.2.1),
+         minqa (>= 1.2.4),
+         methods (>= 3.3.2),
+         learnerSelectoR (>= 0.8.2),
+         regressoR.base (>= 0.8.0),
+         regressoR.quality (>= 0.8.0),
+         regressoR.functional.models (>= 0.8.0),
+         stats (>= 3.3.2)
+Suggests: testthat (>= 2.0.0),
+          roxygen2 (>= 6.0.1)
+Remotes: github::thomasWeise/dataTransformeR
+         github::thomasWeise/learnerSelectoR
+         github::thomasWeise/functionComposeR
+         github::thomasWeise/regressoR.base
+         github::thomasWeise/regressoR.quality
+         github::thomasWeise/regressoR.functional.models
+Collate: 
+    'FittedFunctionalModel.R'
+    'TransformedFittedFunctionalModel.R'
+    'tools.R'
+    'utils.R'
+    'cmaes.R'
+    'de.R'
+    'nls.R'
+    'dfoptim.R'
+    'nlslm.R'
+    'minqa.R'
+    'defaultFitters.R'
+    'fit.R'
+    'fitTransformed.R'
+RoxygenNote: 6.0.1.9000
