@@ -21,8 +21,11 @@
 #' @param model an instance of \code{\link{FunctionalModel}}
 #' @param par the initial starting point
 #' @param fitters the fitters
-#' @param transformed.data the transformed data for the first fitting step
-#' @param transformed.metric the transformed metric for the first fitting step
+#' @param transformation.x the transformation along the \code{x}-axis, or
+#'   \code{NULL} if none was applied to the data
+#' @param transformation.y the transformation along the \code{y}-axis, or
+#'   \code{NULL} if none was applied to the data
+#' @param metric.transformed the transformed metric for the first fitting step
 #' @return On success, an instance of \code{\link{FittedFunctionalModel}}.
 #'   \code{NULL} on failure.
 #' @export model.fit.transformed
@@ -44,48 +47,64 @@
 #'   dataTransformeR::Transformation.log(noisy.y));
 #'
 #' metric <- regressoR.quality::default(noisy.x, noisy.y);
-#' transformed.metric <- regressoR.quality::default(transformed.data@x@data, transformed.data@y@data);
+#' metric.transformed <- regressoR.quality::default(transformed.data@x@data,
+#'                                                  transformed.data@y@data);
 #' model <- regressoR.functional.models::quadratic();
-#' result <- model.fit.transformed(metric, model, transformed.data, transformed.metric);
+#' result <- model.fit.transformed(metric, model,
+#'                                 transformed.data@x@transformation,
+#'                                 transformed.data@y@transformation,
+#'                                 metric.transformed);
 #'
 #' result.2 <- learnerSelectoR::learning.Result.finalize(result)
 #' plot(noisy.x, noisy.y)
 #' lines(noisy.x, result.2@f(noisy.x), col="red")
-model.fit.transformed <- function(metric, model, transformed.data=NULL, transformed.metric=NULL,
+model.fit.transformed <- function(metric, model,
+                                  transformation.x=NULL, transformation.y=NULL,
+                                  metric.transformed=NULL,
                                   par=NULL,
                                   fitters = model.fit.defaultFitters(base::length(metric@x), model@paramCount)) {
-  if(base::is.null(transformed.data)) {
-    if(base::is.null(transformed.metric)) {
+
+  f.x.i <- base::is.null(transformation.x);
+  f.y.i <- base::is.null(transformation.y);
+  if(f.x.i && f.y.i) {
+    if(base::is.null(metric.transformed)) {
       return(model.fit(metric=metric, model=model,par=par, fitters=fitters));
     } else {
-      base::stop("Transformed metric must be NULL if transformed data is NULL.");
+      base::stop("Transformed metric must be NULL if transformations are both NULL.");
     }
   } else {
-    if(base::is.null(transformed.metric)) {
-      base::stop("Transformed metric canot be NULL if transformed data is not NULL.");
+    if(base::is.null(metric.transformed)) {
+      base::stop("Transformed metric canot be NULL if at least one transformation is not NULL.");
     }
   }
 
-  result <- model.fit(metric=transformed.metric, model=model, par=par,
+  result <- model.fit(metric=metric.transformed, model=model, par=par,
                       fitters=fitters);
   if(base::is.null(result)) {
     return(NULL);
   }
-  if(base::identical(transformed.metric, metric)) {
+  if(base::identical(metric.transformed, metric)) {
     # This is highly odd, the transformed metric and the metric are the same.
     # OK, then we can quite here as well.
     return(result);
   }
 
   f <- model@f;
-  f.x <- transformed.data@x@transformation@forward;
-  f.x.i <- base::identical(f.x, identity);
-  f.y <- transformed.data@y@transformation@backward;
-  f.y.i <- base::identical(f.y, identity);
+
+  if(!f.x.i) {
+    f.x <- transformation.x@forward;
+    f.x.i <- base::identical(f.x, identity);
+  }
+
+  if(!f.y.i) {
+    f.y <- transformation.y@backward;
+    f.y.i <- base::identical(f.y, identity);
+  }
+
   if(f.x.i) {
     if(f.y.i) {
       # if all data is identity transformed, we can stop here
-      base::stop("Transformation cannot be identity if metrics differ.");
+      base::stop("Transformations cannot both be identity if metrics differ.");
     } else {
       # x is identity, y is not
       f.n <- function(x, par) f.y(f(x, par));
@@ -121,8 +140,8 @@ model.fit.transformed <- function(metric, model, transformed.data=NULL, transfor
   # OK, we have fitted everything, so we can return a new model
   return(TransformedFittedFunctionalModel.new(
             model=model, par=result.2@par, quality=result.2@quality,
-            transform.x = transformed.data@x@transformation@forward,
-            transform.x.complexity = transformed.data@x@transformation@complexity,
-            transform.y = transformed.data@y@transformation@backward,
-            transform.y.complexity = transformed.data@y@transformation@complexity));
+            transform.x = transformation.x@forward,
+            transform.x.complexity = transformation.x@complexity,
+            transform.y = transformation.y@backward,
+            transform.y.complexity = transformation.y@complexity));
 }

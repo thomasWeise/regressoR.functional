@@ -20,13 +20,16 @@ test_that("Test model.fit.transformed", {
   metric <- regressoR.quality::default(noisy.x, noisy.y);
   expect_is(metric, "RegressionQualityMetric");
 
-  transformed.metric <- regressoR.quality::default(transformed.data@x@data, transformed.data@y@data);
+  metric.transformed <- regressoR.quality::default(transformed.data@x@data, transformed.data@y@data);
   expect_is(transformed.metric, "RegressionQualityMetric");
 
   model <- regressoR.functional.models::quadratic();
   expect_is(model, "FunctionalModel");
 
-  result <- model.fit.transformed(metric, model, transformed.data, transformed.metric);
+  result <- model.fit.transformed(metric, model,
+                                  transformed.data@x@transformation,
+                                  transformed.data@y@transformation,
+                                  metric.transformed);
   expect_is(result, "TransformedFittedFunctionalModel");
   expect_lt(result@quality, 0.5);
   validObject(result);

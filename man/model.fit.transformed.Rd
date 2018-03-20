@@ -4,8 +4,8 @@
 \alias{model.fit.transformed}
 \title{Fit the Given Model Blueprint to the Specified Data}
 \usage{
-model.fit.transformed(metric, model, transformed.data = NULL,
-  transformed.metric = NULL, par = NULL,
+model.fit.transformed(metric, model, transformation.x = NULL,
+  transformation.y = NULL, metric.transformed = NULL, par = NULL,
   fitters = model.fit.defaultFitters(base::length(metric@x),
   model@paramCount))
 }
@@ -15,9 +15,13 @@ model.fit.transformed(metric, model, transformed.data = NULL,
 
 \item{model}{an instance of \code{\link{FunctionalModel}}}
 
-\item{transformed.data}{the transformed data for the first fitting step}
+\item{transformation.x}{the transformation along the \code{x}-axis, or
+\code{NULL} if none was applied to the data}
 
-\item{transformed.metric}{the transformed metric for the first fitting step}
+\item{transformation.y}{the transformation along the \code{y}-axis, or
+\code{NULL} if none was applied to the data}
+
+\item{metric.transformed}{the transformed metric for the first fitting step}
 
 \item{par}{the initial starting point}
 
@@ -56,9 +60,13 @@ transformed.data <- dataTransformeR::TransformedData2D.new(
   dataTransformeR::Transformation.log(noisy.y));
 
 metric <- regressoR.quality::default(noisy.x, noisy.y);
-transformed.metric <- regressoR.quality::default(transformed.data@x@data, transformed.data@y@data);
+metric.transformed <- regressoR.quality::default(transformed.data@x@data,
+                                                 transformed.data@y@data);
 model <- regressoR.functional.models::quadratic();
-result <- model.fit.transformed(metric, model, transformed.data, transformed.metric);
+result <- model.fit.transformed(metric, model,
+                                transformed.data@x@transformation,
+                                transformed.data@y@transformation,
+                                metric.transformed);
 
 result.2 <- learnerSelectoR::learning.Result.finalize(result)
 plot(noisy.x, noisy.y)
