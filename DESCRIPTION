@@ -29,11 +29,11 @@ Imports: cmaes (>= 1.0.11),
          stats (>= 3.3.2)
 Suggests: testthat (>= 2.0.0),
           roxygen2 (>= 6.0.1)
-Remotes: github::thomasWeise/dataTransformeR
-         github::thomasWeise/learnerSelectoR
-         github::thomasWeise/functionComposeR
-         github::thomasWeise/regressoR.base
-         github::thomasWeise/regressoR.quality
+Remotes: github::thomasWeise/dataTransformeR,
+         github::thomasWeise/learnerSelectoR,
+         github::thomasWeise/functionComposeR,
+         github::thomasWeise/regressoR.base,
+         github::thomasWeise/regressoR.quality,
          github::thomasWeise/regressoR.functional.models
 Collate: 
     'FittedFunctionalModel.R'
