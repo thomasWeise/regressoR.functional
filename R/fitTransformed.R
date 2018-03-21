@@ -78,14 +78,16 @@ FunctionalModel.fit.transformed <- function(metric, model,
     }
   }
 
-  result <- FunctionalModel.fit(metric=metric.transformed, model=model, par=par,
-                      fitters=fitters);
+  # The first fitting step takes place on the raw data.
+  result <- FunctionalModel.fit(metric=metric.transformed, model=model,
+                                par=par, fitters=fitters);
   if(base::is.null(result)) {
     return(NULL);
   }
   if(base::identical(metric.transformed, metric)) {
-    # This is highly odd, the transformed metric and the metric are the same.
-    # OK, then we can quite here as well.
+    # This is odd, the transformed metric and the metric are the same. This may
+    # happen if we fit directly on the raw data and both transformations are
+    # identity transformations anyway. Anyway, we can stop here.
     return(result);
   }
 
