@@ -64,17 +64,34 @@ FunctionalModel.fit.transformed <- function(metric, model,
                                   par=NULL,
                                   fitters = FunctionalModel.fit.defaultFitters(base::length(metric@x), model@paramCount)) {
 
+  # First we check the transformations whether they are NULL or identity
+  # transformations.
   f.x.i <- base::is.null(transformation.x);
+  if(!f.x.i) {
+    f.x <- transformation.x@forward;
+    f.x.i <- base::identical(f.x, identity);
+  }
+
   f.y.i <- base::is.null(transformation.y);
+  if(!f.y.i) {
+    f.y <- transformation.y@backward;
+    f.y.i <- base::identical(f.y, identity);
+  }
+
   if(f.x.i && f.y.i) {
-    if(base::is.null(metric.transformed)) {
+    # Both transformations are NULL or identity transformations
+    if(base::is.null(metric.transformed) ||
+       base::identical(metric.transformed, metric)) {
+      # OK, we fit on the original, raw data. The transformations are identity
+      # or NULL and the transformed metric is NULL or identical to the actual
+      # metric.
       return(FunctionalModel.fit(metric=metric, model=model,par=par, fitters=fitters));
     } else {
-      base::stop("Transformed metric must be NULL if transformations are both NULL.");
+      base::stop("Transformed metric must be identical to actual metric or NULL if transformations are both NULL or identity.");
     }
   } else {
     if(base::is.null(metric.transformed)) {
-      base::stop("Transformed metric canot be NULL if at least one transformation is not NULL.");
+      base::stop("Transformed metric canot be NULL if at least one transformation is not NULL or identity.");
     }
   }
 
@@ -85,32 +102,19 @@ FunctionalModel.fit.transformed <- function(metric, model,
     return(NULL);
   }
   if(base::identical(metric.transformed, metric)) {
-    # This is odd, the transformed metric and the metric are the same. This may
-    # happen if we fit directly on the raw data and both transformations are
-    # identity transformations anyway. Anyway, we can stop here.
+    # This is odd, the transformed metric and the metric are the same. This
+    # should only happen if we fit directly on the raw data and both
+    # transformations are identity transformations anyway. Anyway, we can stop
+    # here.
     return(result);
   }
 
   f <- model@f;
 
-  if(!f.x.i) {
-    f.x <- transformation.x@forward;
-    f.x.i <- base::identical(f.x, identity);
-  }
-
-  if(!f.y.i) {
-    f.y <- transformation.y@backward;
-    f.y.i <- base::identical(f.y, identity);
-  }
-
+  # Here, it is impossible that both f.x.i and f.y.i are TRUE
   if(f.x.i) {
-    if(f.y.i) {
-      # if all data is identity transformed, we can stop here
-      base::stop("Transformations cannot both be identity if metrics differ.");
-    } else {
-      # x is identity, y is not
-      f.n <- function(x, par) f.y(f(x, par));
-    }
+    # x is identity, y is not
+    f.n <- function(x, par) f.y(f(x, par));
   } else {
     # x is not identity
     if(f.y.i) {
