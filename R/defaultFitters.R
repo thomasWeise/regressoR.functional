@@ -101,15 +101,6 @@ FunctionalModel.fit.defaultFitters <- function(dataSize = 1000, paramCount = 4) 
   if(base::is.null(result)) {
     result <- base::list();
 
-    if(base::bitwAnd(usage, .key.2.nls) == .key.2.nls) {
-      result[[base::length(result) + 1L]] <- .fitters.nls;
-    }
-    if(base::bitwAnd(usage, .key.2.minqadfoptim) == .key.2.minqadfoptim) {
-      result[[base::length(result) + 1L]] <- .fitters.minqadfoptim;
-    }
-    if(base::bitwAnd(usage, .key.2.cmaesde) == .key.2.cmaesde) {
-      result[[base::length(result) + 1L]] <- .fitters.cmaesde;
-    }
     if(base::bitwAnd(usage, .key.nlslm) == .key.nlslm) {
       result[[base::length(result) + 1L]] <- FunctionalModel.fit.nlslm;
     }
