@@ -6,43 +6,12 @@
 #' @include nls.R
 
 
-# The internal least squares approach: nls.lm with fallback to nls
-.fitters.nls <- function(metric, model, par=NULL) {
-  result <- FunctionalModel.fit.nlslm(metric, model, par);
-  if(base::is.null(result)) {
-    return(FunctionalModel.fit.nls(metric, model, par));
-  }
-  return(result);
-}
-
-# The internal population-based approach: cma-es with fallback to de
-.fitters.cmaesde <- function(metric, model, par=NULL) {
-  result <- FunctionalModel.fit.cmaes(metric, model, par);
-  if(base::is.null(result)) {
-    return(FunctionalModel.fit.de(metric, model, par));
-  }
-  return(result);
-}
-
-
-# The internal local search-like approach: minqa with fallback to df
-.fitters.minqadfoptim <- function(metric, model, par=NULL) {
-  result <- FunctionalModel.fit.minqa(metric, model, par);
-  if(base::is.null(result)) {
-    return(FunctionalModel.fit.dfoptim(metric, model, par));
-  }
-  return(result);
-}
-
-.key.2.nls          <- 1L;
-.key.2.minqadfoptim <- 2L;
-.key.2.cmaesde      <- 4L;
-.key.nlslm          <- 8L;
-.key.minqa          <- 16L;
-.key.cmaes          <- 32L;
-.key.nls            <- 64L;
-.key.dfoptim        <- 128L;
-.key.de             <- 256L;
+.key.nlslm          <- 1L;
+.key.minqa          <- 2L;
+.key.de             <- 4L;
+.key.cmaes          <- 8L;
+.key.dfoptim        <- 16L;
+.key.nls            <- 32L;
 
 
 # find out which fitters are available
@@ -66,15 +35,6 @@
   if(base::require("dfoptim")) {
     available <- available + .key.dfoptim;
   }
-  if(base::bitwAnd(available, (.key.cmaes + .key.de)) == (.key.cmaes + .key.de)) {
-    available <- available + .key.2.cmaesde;
-  }
-  if(base::bitwAnd(available, (.key.nlslm + .key.nls)) == (.key.nlslm + .key.nls)) {
-    available <- available + .key.2.nls;
-  }
-  if(base::bitwAnd(available, (.key.minqa + .key.dfoptim)) == (.key.minqa + .key.dfoptim)) {
-    available <- available + .key.2.minqadfoptim;
-  }
   return(available);
 }
 
@@ -95,52 +55,28 @@ FunctionalModel.fit.defaultFitters <- function(dataSize = 1000, paramCount = 4) 
   usage <- .fitters.available;
 
   complexity <- (dataSize * paramCount * paramCount);
-  if(complexity <= 300L) {
-    # we use all the methods
-    usage <- base::bitwAnd(usage, base::bitwNot(.key.2.cmaesde +
-                                                .key.2.minqadfoptim +
-                                                .key.2.nls));
-  } else {
-    # we use either nls.lm or nls
-    if(base::bitwAnd(usage, .key.2.nls) == .key.2.nls) {
-      usage <- base::bitwAnd(usage, base::bitwNot(.key.nls + .key.nlslm));
-    }
 
-    if(complexity <= 600L) {
-      # if the complexity is less than 600, we can use both cmaes and de
-      usage <- base::bitwAnd(usage, base::bitwNot(.key.2.cmaesde));
-    } else {
-      # otherwise, we don't use de
-      usage <- base::bitwAnd(usage, base::bitwNot(.key.de));
+  # nls is fast but has comparatively bad results, so for bigger problems we won't use it,
+  # especially if we have nlslm or the complexity is very big
+  if( (complexity > 10000L) &&
+     ((complexity > 30000L) || (base::bitwAnd(usage, .key.nlslm) == .key.nlslm))) {
+    usage <- base::bitwAnd(usage, base::bitwNot(.key.nls));
+  }
 
-      if(complexity <= 16000L) {
-        # otherwise, we use cmaes only (with fallback to cmaes-de, if necessary)
-        if(base::bitwAnd(usage, .key.2.cmaesde) == .key.2.cmaesde) {
-          usage <- base::bitwAnd(usage, base::bitwNot(.key.cmaes));
-        }
-      } else {
-        # if the complexity is too big, we won't use cma-es either
-        usage <- base::bitwAnd(usage, base::bitwNot(.key.2.cmaesde + .key.cmaes));
-      }
-    }
+  # cmaes gives by far the best results, but is also very slow, so we can only use it for small problems
+  if(complexity > 600L) {
+    usage <- base::bitwAnd(usage, base::bitwNot(.key.cmaes));
+  }
 
-    if(complexity <= 8000L) {
-      # if the complexity is less than 8000, we can use both minqa and dfoptim
-      usage <- base::bitwAnd(usage, base::bitwNot(.key.2.minqadfoptim));
-    } else {
-      if(complexity <= 24000L) {
-        # otherwise, if the complexity is below 24000, we only use minqa
-        if(base::bitwAnd(usage, .key.dfoptim) == .key.dfoptim) {
-          usage <- base::bitwAnd(usage, base::bitwNot(.key.dfoptim));
-        }
-        if(base::bitwAnd(usage, .key.2.minqadfoptim) == .key.2.minqadfoptim) {
-          usage <- base::bitwAnd(usage, base::bitwNot(.key.minqa));
-        }
-      } else {
-        # if the complexity is too big, we won't use minqa, just dfoptim
-        usage <- base::bitwAnd(usage, base::bitwNot(.key.2.minqadfoptim + .key.minqa));
-      }
-    }
+  # de is about as good as nlsm, but maybe 10 times as slow
+  if( (complexity > 4500L) &&
+     ((complexity > 8000L) || (base::bitwAnd(usage, .key.nlslm) == .key.nlslm))) {
+    usage <- base::bitwAnd(usage, base::bitwNot(.key.cmaes));
+  }
+
+  # dfoptim is usually worse than minqa, so we don't use it in larger problems if we have minqa
+  if((complexity > 3000L) && (base::bitwAnd(usage, .key.minqa) == .key.minqa)) {
+    usage <- base::bitwAnd(usage, base::bitwNot(.key.dfoptim));
   }
 
   # ok, our fitter policy has failed, take the first best fitter

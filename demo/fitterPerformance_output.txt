@@ -1,0 +1,74 @@
+### Compare the Performance of the Different Function Fitters ###
+      methods: nlslm, minqa, cmaes, de, dfoptim, nls
+min data size: 10
+max data size: 1000
+        steps: 4
+        model: par[1] + (x * (par[2] + (x * par[3]))) with 3 parameters
+
+
+##########################################################################
+# Now Tackling Problems of Range 10...258
+##########################################################################
+60 problems have been created with mean size 134.4167
+...now beginning to benchmark.
+        methods:      nlslm                 minqa                 cmaes                 de                    dfoptim               nls
+        quality mean: 7.80404473023156e-14  1.1970031910903e-05   1.81885863017637e-14  5.06799840354229e-08  2.86311000464297e-06  3.5882214813651
+        quality rank: 5014.85714285714      7303.67142857143      1883.32857142857      2791.05714285714      9407.08571428571      11580
+        time mean:    1.46436214672025      3.13924149372404      99.3883347947414      40.95684031358        7.43482711752342      1.0808572870317
+        time rank:    53                    88                    193                   158                   123                   18
+by quality-mean: cmaes, nlslm, de, dfoptim, minqa, nls
+by quality-rank: cmaes, de, nlslm, minqa, dfoptim, nls
+by    time-rank: nls, nlslm, minqa, dfoptim, de, cmaes
+by    time-mean: nls, nlslm, minqa, dfoptim, de, cmaes
+##########################################################################
+
+
+##########################################################################
+# Now Tackling Problems of Range 259...505
+##########################################################################
+60 problems have been created with mean size 385.3167
+...now beginning to benchmark.
+        methods:      nlslm                 minqa                 cmaes                 de                    dfoptim               nls
+        quality mean: 3.54377114659561e-14  9.82049391948872e-10  8.30652638148001e-15  1.18986822977548e-10  9.60854889367571e-08  2.28619780607761
+        quality rank: 5075.62857142857      7380.97142857143      1981.65714285714      2549.75714285714      9411.98571428571      11580
+        time mean:    2.76618601287059      2.89186643243623      102.721109393426      46.0467790966136      7.69324542743549      1.16430204756153
+        time rank:    59.6571428571429      81.3428571428571      193                   158                   123                   18
+by quality-mean: cmaes, nlslm, de, minqa, dfoptim, nls
+by quality-rank: cmaes, de, nlslm, minqa, dfoptim, nls
+by    time-rank: nls, nlslm, minqa, dfoptim, de, cmaes
+by    time-mean: nls, nlslm, minqa, dfoptim, de, cmaes
+##########################################################################
+
+
+##########################################################################
+# Now Tackling Problems of Range 506...752
+##########################################################################
+60 problems have been created with mean size 623.35
+...now beginning to benchmark.
+        methods:      nlslm                 minqa                 cmaes                 de                    dfoptim               nls
+        quality mean: 2.8948023473467e-14   8.89002572011247e-10  6.42131975555545e-15  1.216733305771e-12    3.11818854150197e-08  2.80417047902779
+        quality rank: 5080.98571428572      7395.94285714286      1996.32857142857      2499.27142857143      9427.47142857143      11580
+        time mean:    3.76556367609195      2.57352395038807      96.3753724096661      44.5633468341701      7.09991585738076      1.03507706634552
+        time rank:    88                    53                    193                   158                   123                   18
+by quality-mean: cmaes, nlslm, de, minqa, dfoptim, nls
+by quality-rank: cmaes, de, nlslm, minqa, dfoptim, nls
+by    time-rank: nls, minqa, nlslm, dfoptim, de, cmaes
+by    time-mean: nls, minqa, nlslm, dfoptim, de, cmaes
+##########################################################################
+
+
+##########################################################################
+# Now Tackling Problems of Range 753...1000
+##########################################################################
+60 problems have been created with mean size 864.3
+...now beginning to benchmark.
+        methods:      nlslm                 minqa                 cmaes                 de                    dfoptim               nls
+        quality mean: 2.91665839691851e-14  2.22774596915618e-09  5.69671488937546e-15  4.93768542327439e-11  6.90972623158507e-08  1.55633723611092
+        quality rank: 4860.88571428571      7371.2                1898.15714285714      2856.32857142857      9413.42857142857      11580
+        time mean:    4.82064808222664      2.91575772878879      99.1291861204776      47.3889097421968      7.62881454196171      1.03877565732622
+        time rank:    88                    53                    193                   158                   123                   18
+by quality-mean: cmaes, nlslm, de, minqa, dfoptim, nls
+by quality-rank: cmaes, de, nlslm, minqa, dfoptim, nls
+by    time-rank: nls, minqa, nlslm, dfoptim, de, cmaes
+by    time-mean: nls, minqa, nlslm, dfoptim, de, cmaes
+##########################################################################
