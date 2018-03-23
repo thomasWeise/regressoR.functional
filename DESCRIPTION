@@ -49,4 +49,5 @@ Collate:
     'defaultFitters.R'
     'fit.R'
     'fitTransformed.R'
+    'makeLearners.R'
 RoxygenNote: 6.0.1.9000

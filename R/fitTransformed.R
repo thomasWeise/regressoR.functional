@@ -59,10 +59,10 @@
 #' plot(noisy.x, noisy.y)
 #' lines(noisy.x, result.2@f(noisy.x), col="red")
 FunctionalModel.fit.transformed <- function(metric, model,
-                                  transformation.x=NULL, transformation.y=NULL,
-                                  metric.transformed=NULL,
-                                  par=NULL,
-                                  fitters = FunctionalModel.fit.defaultFitters(length(metric@x), model@paramCount)) {
+                                            transformation.x=NULL, transformation.y=NULL,
+                                            metric.transformed=NULL,
+                                            par=NULL,
+                                            fitters = FunctionalModel.fit.defaultFitters(length(metric@x), model@paramCount)) {
 
   # First we check the transformations whether they are NULL or identity
   # transformations.

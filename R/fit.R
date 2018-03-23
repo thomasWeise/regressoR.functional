@@ -52,8 +52,7 @@
 #' # [1]  3.919365 -2.938202  1.998102
 FunctionalModel.fit <- function(metric, model, par=NULL,
                                 fitters = FunctionalModel.fit.defaultFitters(length(metric@x), model@paramCount)) {
-  if(is.null(metric) || is.null(model)
-                           || is.null(fitters)) { return(NULL); }
+  if(is.null(metric) || is.null(model) || is.null(fitters)) { return(NULL); }
 
   fitterCount <- length(fitters);
   if(fitterCount <= 0L) { return(NULL); }
