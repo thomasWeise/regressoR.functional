@@ -19,16 +19,16 @@
 #'   FunctionalModel.par.check
 #' @export FunctionalModel.fit.minqa
 FunctionalModel.fit.minqa <- function(metric, model, par=NULL) {
-  if(base::is.null(metric) || base::is.null(model) ) { return(NULL); }
+  if(is.null(metric) || is.null(model) ) { return(NULL); }
 
-  if(base::is.null(par)) {
+  if(is.null(par)) {
     par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric);
   }
 
   fn <- function(par) metric@quality(model@f, par);
 
   limits <- .fix.boundaries(model);
-  if(base::is.null(limits)) {
+  if(is.null(limits)) {
     lower <- NULL;
     upper <- NULL;
   } else {
@@ -40,14 +40,14 @@ FunctionalModel.fit.minqa <- function(metric, model, par=NULL) {
     result <- NULL;
 
     .ignore.errors({
-      if(base::is.null(lower)) {
-        if(base::is.null(upper)) {
+      if(is.null(lower)) {
+        if(is.null(upper)) {
           result <- minqa::bobyqa(par=par, fn=fn);
         } else {
           result <- minqa::bobyqa(par=par, fn=fn, upper=upper);
         }
       } else {
-        if(base::is.null(upper)) {
+        if(is.null(upper)) {
           result <- minqa::bobyqa(par=par, fn=fn, lower=lower);
         } else {
           result <- minqa::bobyqa(par=par, fn=fn, lower=lower, upper=upper);
@@ -55,7 +55,7 @@ FunctionalModel.fit.minqa <- function(metric, model, par=NULL) {
       }
       });
 
-    if(!base::is.null(result)) {
+    if(!is.null(result)) {
       resultpar <- result$par;
       if(regressoR.functional.models::FunctionalModel.par.check(model, resultpar)) {
         resultq <- result$fval;
@@ -66,7 +66,7 @@ FunctionalModel.fit.minqa <- function(metric, model, par=NULL) {
     }
 
     result <- minqa::newuoa(par=par, fn=fn);
-    if(!base::is.null(result)) {
+    if(!is.null(result)) {
       resultpar <- result$par;
       if(regressoR.functional.models::FunctionalModel.par.check(model, resultpar)) {
         resultq <- result$fval;

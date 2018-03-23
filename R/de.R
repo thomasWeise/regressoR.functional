@@ -19,16 +19,16 @@
 #'   FunctionalModel.par.check
 #' @export FunctionalModel.fit.de
 FunctionalModel.fit.de <- function(metric, model, par=NULL) {
-  if(base::is.null(metric) || base::is.null(model) ) { return(NULL); }
+  if(is.null(metric) || is.null(model) ) { return(NULL); }
 
-  if(base::is.null(par)) {
+  if(is.null(par)) {
     par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric);
   }
 
   fn <- function(par) metric@quality(model@f, par);
 
   limits <- .fix.boundaries(model);
-  if(base::is.null(limits)) {
+  if(is.null(limits)) {
     lower <- NULL;
     upper <- NULL;
   } else {
@@ -41,19 +41,19 @@ FunctionalModel.fit.de <- function(metric, model, par=NULL) {
   .ignore.errors({
     initialPop <- .make.initial.pop(par, lower, upper, NP, model@paramCount);
 
-    if(base::is.null(lower)) {
-      lower <- base::rep(-1e10 - base::max(base::abs(initialPop)), model@paramCount);
+    if(is.null(lower)) {
+      lower <- rep(-1e10 - max(abs(initialPop)), model@paramCount);
     }
-    if(base::is.null(upper)) {
-      upper <- base::rep(1e10 + base::max(base::abs(initialPop)), model@paramCount);
+    if(is.null(upper)) {
+      upper <- rep(1e10 + max(abs(initialPop)), model@paramCount);
     }
 
     result <- DEoptim::DEoptim(fn=fn, lower=lower, upper=upper,
                       DEoptim::DEoptim.control(NP=NP, initialpop=initialPop, trace=FALSE));
 
-    if(base::is.null(result) || (base::length(result) < 2)) { return(NULL); }
+    if(is.null(result) || (length(result) < 2)) { return(NULL); }
     result <- result[[1]];
-    if(base::is.null(result) ) { return(NULL); }
+    if(is.null(result) ) { return(NULL); }
     if(!(regressoR.functional.models::FunctionalModel.par.check(model, result$bestmem))) { return(NULL); }
     if(!(learnerSelectoR::learning.checkQuality(result$bestval))) { return(NULL); }
     return(FittedFunctionalModel.new(model, result$bestmem, result$bestval));

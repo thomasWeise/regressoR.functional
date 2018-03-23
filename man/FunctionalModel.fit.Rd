@@ -5,7 +5,7 @@
 \title{Fit the Given Model Blueprint to the Specified Data}
 \usage{
 FunctionalModel.fit(metric, model, par = NULL,
-  fitters = FunctionalModel.fit.defaultFitters(base::length(metric@x),
+  fitters = FunctionalModel.fit.defaultFitters(length(metric@x),
   model@paramCount))
 }
 \arguments{

@@ -19,16 +19,16 @@
 #'   FunctionalModel.par.check
 #' @export FunctionalModel.fit.cmaes
 FunctionalModel.fit.cmaes <- function(metric, model, par=NULL) {
-  if(base::is.null(metric) || base::is.null(model) ) { return(NULL); }
+  if(is.null(metric) || is.null(model) ) { return(NULL); }
 
-  if(base::is.null(par)) {
+  if(is.null(par)) {
     par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric);
   }
 
   fn <- function(par) metric@quality(model@f, par);
 
   limits <- .fix.boundaries(model);
-  if(base::is.null(limits)) {
+  if(is.null(limits)) {
     lower <- NULL;
     upper <- NULL;
   } else {
@@ -37,21 +37,21 @@ FunctionalModel.fit.cmaes <- function(metric, model, par=NULL) {
   }
 
   .ignore.errors({
-    if(base::is.null(lower)) {
-      if(base::is.null(upper)) {
+    if(is.null(lower)) {
+      if(is.null(upper)) {
         result <- cmaes::cma_es(par=par, fn=fn);
       } else {
         result <- cmaes::cma_es(par=par, fn=fn, upper=upper);
       }
     } else {
-      if(base::is.null(upper)) {
+      if(is.null(upper)) {
         result <- cmaes::cma_es(par=par, fn=fn, lower=lower);
       } else {
         result <- cmaes::cma_es(par=par, fn=fn, lower=lower, upper=upper);
       }
     }
 
-    if(base::is.null(result)) { return(NULL); }
+    if(is.null(result)) { return(NULL); }
     if(!(regressoR.functional.models::FunctionalModel.par.check(model, result$par))) { return(NULL); }
     if(!(learnerSelectoR::learning.checkQuality(result$value))) { return(NULL); }
     return(FittedFunctionalModel.new(model, result$par, result$value));

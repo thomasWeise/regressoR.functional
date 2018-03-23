@@ -22,7 +22,7 @@ FittedFunctionalModel <- methods::setClass(
   representation = methods::representation(model="FunctionalModel",
                                            par="numeric"),
   validity = function(object) {
-    if (base::is.null(object@model) ||
+    if (is.null(object@model) ||
        (!(methods::is(object@model, "FunctionalModel")))) {
       return("Model model must be properly defined.");
     }
@@ -52,21 +52,21 @@ FittedFunctionalModel <- methods::setClass(
 #' @export FittedFunctionalModel.new
 #' @seealso FittedFunctionalModel.finalized
 FittedFunctionalModel.new <- function(model, par, quality) {
-  model <- base::force(model);
+  model <- force(model);
 
-  f <- base::force(model@f);
-  par <- base::force(base::unname(par));
+  f <- force(model@f);
+  par <- force(unname(par));
   fn <- function(x) f(x, par);
 
   result <- methods::new("FittedFunctionalModel",
                          model=model, par=par, quality=quality, f=fn,
                          size=model@paramCount);
-  result <- base::force(result);
-  result@par <- base::force(result@par);
-  result@f <- base::force(result@f);
-  result@size <- base::force(result@size);
-  result@quality <- base::force(result@quality);
-  result <- base::force(result);
+  result <- force(result);
+  result@par <- force(result@par);
+  result@f <- force(result@f);
+  result@size <- force(result@size);
+  result@quality <- force(result@quality);
+  result <- force(result);
 
   methods::validObject(result);
   return(result);
@@ -81,9 +81,9 @@ FittedFunctionalModel.new <- function(model, par, quality) {
 #' @importFrom functionComposeR function.substitute
 #' @export FittedFunctionalModel.finalize
 FittedFunctionalModel.finalize <- function(object) {
-  object <- base::force(object);
-  object@f <- functionComposeR::function.substitute(object@model@f, base::list(par=object@par));
-  object@f <- base::force(object@f);
+  object <- force(object);
+  object@f <- functionComposeR::function.substitute(object@model@f, list(par=object@par));
+  object@f <- force(object@f);
   return(object);
 }
 

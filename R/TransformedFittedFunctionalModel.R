@@ -21,32 +21,32 @@ TransformedFittedFunctionalModel <- methods::setClass(
                                            transform.y="function"),
   validity = function(object) {
     # check transform.x function
-    if(base::is.null(object@transform.x) ||
-       (!(base::is.function(object@transform.x)))) {
+    if(is.null(object@transform.x) ||
+       (!(is.function(object@transform.x)))) {
       return("transform.x function must be defined.");
     }
-    if(base::is.primitive(object@transform.x)) {
-      transform.x.args <- base::formals(base::args(object@transform.x));
+    if(is.primitive(object@transform.x)) {
+      transform.x.args <- formals(args(object@transform.x));
     } else {
-      transform.x.args <- base::formals(object@transform.x);
+      transform.x.args <- formals(object@transform.x);
     }
-    if((base::length(transform.x.args) != 1L) ||
-       (!(base::identical(base::names(transform.x.args), base::c("x"))))) {
+    if((length(transform.x.args) != 1L) ||
+       (!(identical(names(transform.x.args), c("x"))))) {
       return("transform.x function must have at exactly argument named 'x'.");
     }
 
     # check transform.y function
-    if(base::is.null(object@transform.y) ||
-       (!(base::is.function(object@transform.y)))) {
+    if(is.null(object@transform.y) ||
+       (!(is.function(object@transform.y)))) {
       return("transform.y function must be defined.");
     }
-    if(base::is.primitive(object@transform.y)) {
-      transform.y.args <- base::formals(base::args(object@transform.y));
+    if(is.primitive(object@transform.y)) {
+      transform.y.args <- formals(args(object@transform.y));
     } else {
-      transform.y.args <- base::formals(object@transform.y);
+      transform.y.args <- formals(object@transform.y);
     }
-    if((base::length(transform.y.args) != 1L) ||
-       (!(base::identical(base::names(transform.y.args), base::c("x"))))) {
+    if((length(transform.y.args) != 1L) ||
+       (!(identical(names(transform.y.args), c("x"))))) {
       return("transform.y function must have at exactly argument named 'x'.");
     }
 
@@ -74,27 +74,27 @@ TransformedFittedFunctionalModel <- methods::setClass(
 #' @export TransformedFittedFunctionalModel.new
 #' @seealso TransformedFittedFunctionalModel.finalized
 TransformedFittedFunctionalModel.new <- function(model, par, quality,
-                                                 transform.x=base::identity,
+                                                 transform.x=identity,
                                                  transform.x.complexity=0L,
-                                                 transform.y=base::identity,
+                                                 transform.y=identity,
                                                  transform.y.complexity=0L) {
   # setup parameters and default values
-  if(base::is.null(transform.x) || base::missing(transform.x)) {
-    transform.x <- base::identity;
+  if(is.null(transform.x) || missing(transform.x)) {
+    transform.x <- identity;
     transform.x.complexity <- 0L;
   }
-  if(base::is.null(transform.y) || base::missing(transform.y)) {
-    transform.y <- base::identity;
+  if(is.null(transform.y) || missing(transform.y)) {
+    transform.y <- identity;
     transform.y.complexity <- 0L;
   }
 
   # create function check whether can we just return a normal FittedFunctionalModel?
-  model <- base::force(model);
-  f <- base::force(model@f);
-  par <- base::force(base::unname(par));
+  model <- force(model);
+  f <- force(model@f);
+  par <- force(unname(par));
 
-  if(base::identical(transform.x, base::identity)) {
-    if(base::identical(transform.y, base::identity)) {
+  if(identical(transform.x, identity)) {
+    if(identical(transform.y, identity)) {
       # just return normal model
       return(FittedFunctionalModel.new(model=model, par=par, quality=quality));
     }
@@ -102,7 +102,7 @@ TransformedFittedFunctionalModel.new <- function(model, par, quality,
     fn <- function(x) transform.y(f(x, par));
     transform.x.complexity <- 0L;
   } else {
-    if(base::identical(transform.y, base::identity)) {
+    if(identical(transform.y, identity)) {
       # y transform is identity, we can skip it here
       fn <- function(x) f(transform.x(x), par);
       transform.y.complexity <- 0L;
@@ -117,16 +117,16 @@ TransformedFittedFunctionalModel.new <- function(model, par, quality,
     if(transform.x.complexity < 0L) {
       stop("transform.x.complexity cannot be negative.");
     }
-    if(!(base::identical(transform.x, base::identity))) {
-      stop("transform.x.complexity cannot be 0L if transform.x is not base::identity.");
+    if(!(identical(transform.x, identity))) {
+      stop("transform.x.complexity cannot be 0L if transform.x is not identity.");
     }
   }
   if(transform.y.complexity <= 0L) {
     if(transform.y.complexity < 0L) {
       stop("transform.y.complexity cannot be negative.");
     }
-    if(!(base::identical(transform.y, base::identity))) {
-      stop("transform.y.complexity cannot be 0L if transform.y is not base::identity.");
+    if(!(identical(transform.y, identity))) {
+      stop("transform.y.complexity cannot be 0L if transform.y is not identity.");
     }
   }
 
@@ -138,14 +138,14 @@ TransformedFittedFunctionalModel.new <- function(model, par, quality,
                          transform.y = transform.y,
                          size =(model@paramCount + transform.x.complexity + transform.y.complexity));
 
-  result <- base::force(result);
-  result@par <- base::force(result@par);
-  result@f <- base::force(result@f);
-  result@size <- base::force(result@size);
-  result@quality <- base::force(result@quality);
-  result@transform.x <- base::force(result@transform.x);
-  result@transform.y <- base::force(result@transform.y);
-  result <- base::force(result);
+  result <- force(result);
+  result@par <- force(result@par);
+  result@f <- force(result@f);
+  result@size <- force(result@size);
+  result@quality <- force(result@quality);
+  result@transform.x <- force(result@transform.x);
+  result@transform.y <- force(result@transform.y);
+  result <- force(result);
 
   methods::validObject(result);
   return(result);
@@ -161,10 +161,10 @@ TransformedFittedFunctionalModel.new <- function(model, par, quality,
 #'   \code{\link{FittedFunctionalModel}}
 #' @importFrom functionComposeR function.substitute function.compose
 TransformedFittedFunctionalModel.finalize <- function(object) {
-  object <- base::force(object);
+  object <- force(object);
 
-  x.i.i <- base::identical(object@transform.x, base::identity);
-  y.i.i <- base::identical(object@transform.y, base::identity);
+  x.i.i <- identical(object@transform.x, identity);
+  y.i.i <- identical(object@transform.y, identity);
 
   if(x.i.i && y.i.i) {
     # transform.x and transform.y are the identity transformation
@@ -174,7 +174,7 @@ TransformedFittedFunctionalModel.finalize <- function(object) {
                                 quality=object@quality)));
   }
 
-  f <- functionComposeR::function.substitute(object@model@f, base::list(par=object@par));
+  f <- functionComposeR::function.substitute(object@model@f, list(par=object@par));
 
   if(!(x.i.i)) {
     # transform.x is not the identity transformation
@@ -187,7 +187,7 @@ TransformedFittedFunctionalModel.finalize <- function(object) {
   }
 
   object@f <- f;
-  object@f <- base::force(object@f);
+  object@f <- force(object@f);
   return(object);
 }
 

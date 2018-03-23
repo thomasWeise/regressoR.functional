@@ -22,22 +22,22 @@
 #'   FunctionalModel.par.check
 #' @export FunctionalModel.fit.nls
 FunctionalModel.fit.nls <- function(metric, model, par=NULL) {
-  if(base::is.null(metric) || base::is.null(model) ||
-     base::is.null(metric@x) || base::is.null(metric@y)) { return(NULL); }
+  if(is.null(metric) || is.null(model) ||
+     is.null(metric@x) || is.null(metric@y)) { return(NULL); }
 
-  if(base::is.null(par)) {
+  if(is.null(par)) {
     par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric);
   }
 
   .ignore.errors({
-    if(base::is.null(metric@weights)) {
+    if(is.null(metric@weights)) {
       result <- stats::nls(y ~ model@f(x, par), data=list(x=metric@x, y=metric@y), start=list(par=par));
     } else {
       result <- stats::nls(y ~ model@f(x, par), data=list(x=metric@x, y=metric@y),
                     start=list(par=par), weights=metric@weights);
     }
 
-    if(base::is.null(result) || base::is.null(result$m) || base::is.null(result$m$getPars)) { return(NULL); }
+    if(is.null(result) || is.null(result$m) || is.null(result$m$getPars)) { return(NULL); }
     if(!(result$convInfo$isConv)) { return(NULL); }
     result <- result$m$getPars();
     if(!(regressoR.functional.models::FunctionalModel.par.check(model, result))) { return(NULL); }

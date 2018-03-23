@@ -51,11 +51,11 @@
 #' res2@par
 #' # [1]  3.919365 -2.938202  1.998102
 FunctionalModel.fit <- function(metric, model, par=NULL,
-                                fitters = FunctionalModel.fit.defaultFitters(base::length(metric@x), model@paramCount)) {
-  if(base::is.null(metric) || base::is.null(model)
-                           || base::is.null(fitters)) { return(NULL); }
+                                fitters = FunctionalModel.fit.defaultFitters(length(metric@x), model@paramCount)) {
+  if(is.null(metric) || is.null(model)
+                           || is.null(fitters)) { return(NULL); }
 
-  fitterCount <- base::length(fitters);
+  fitterCount <- length(fitters);
   if(fitterCount <= 0L) { return(NULL); }
 
   # get a starting point
@@ -73,14 +73,14 @@ FunctionalModel.fit <- function(metric, model, par=NULL,
   bestResult <- NULL;
 
   # we can apply all algorithms
-  canUse <- base::rep(TRUE, fitterCount);
+  canUse <- rep(TRUE, fitterCount);
 
   # apply a fitter
   applyFunc <- function(index) {
     if(canUse[index]) {
       res <- (fitters[[index]](metric=metric, model=model,
                                par=bestParams));
-      if((!(base::is.null(res))) && (res@quality < bestQuality)) {
+      if((!(is.null(res))) && (res@quality < bestQuality)) {
         return(res);
       }
     }
@@ -88,17 +88,17 @@ FunctionalModel.fit <- function(metric, model, par=NULL,
   }
 
   # In the next iteration, we only apply fitters which did not already see the current solution
-  canUseFun <- function(x) (base::is.null(x) || (x@quality > bestQuality))
+  canUseFun <- function(x) (is.null(x) || (x@quality > bestQuality))
 
   improved = TRUE;
   while(improved) {
     # apply all fitters
-    current <- base::sapply(X=1L:fitterCount, FUN=applyFunc);
+    current <- sapply(X=1L:fitterCount, FUN=applyFunc);
 
     # was there any improvement?
     improved = FALSE;
     for(res in current) {
-      if((!(base::is.null(res))) && (res@quality < bestQuality)) {
+      if((!(is.null(res))) && (res@quality < bestQuality)) {
         improved = TRUE;
         bestResult <- res;
         bestQuality <- res@quality;
@@ -107,17 +107,17 @@ FunctionalModel.fit <- function(metric, model, par=NULL,
     }
 
     # was there any fitter that did not yet receive the current solution as input?
-    canUse <- base::vapply(X=current, FUN=canUseFun, FUN.VALUE = FALSE);
+    canUse <- vapply(X=current, FUN=canUseFun, FUN.VALUE = FALSE);
   }
 
-  if(base::is.null(bestResult) &&
+  if(is.null(bestResult) &&
      regressoR.functional.models::FunctionalModel.par.check(model, bestParams) &&
      learning.checkQuality(bestQuality)) {
     # strange, ok, let's try to build a new solution
     return(FittedFunctionalModel.new(model, bestParams, bestQuality));
   }
 
-  if(base::is.null(bestResult)) {
+  if(is.null(bestResult)) {
     # No dice: we simply could not make the model fit in any way
     return(NULL);
   }
@@ -128,12 +128,12 @@ FunctionalModel.fit <- function(metric, model, par=NULL,
   improved <- TRUE;
   while(improved) {
     improved <- FALSE;
-    for(i in 1:base::length(bestParams)) {
+    for(i in 1:length(bestParams)) {
       x <- bestParams[i];
-      xr <- base::round(x);
+      xr <- round(x);
       if(xr != x) {
         if((xr >= (-.Machine$integer.max)) && (xr <= .Machine$integer.max)) {
-          xr <- base::as.integer(xr);
+          xr <- as.integer(xr);
         }
         bestCopy[i] <- xr;
         if(regressoR.functional.models::FunctionalModel.par.check(model, bestCopy)) {
@@ -150,12 +150,12 @@ FunctionalModel.fit <- function(metric, model, par=NULL,
   }
   # now let's try all parameters at once
   improved <- FALSE;
-  for(i in 1:base::length(bestParams)) {
+  for(i in 1:length(bestParams)) {
     x <- bestParams[i];
-    xr <- base::round(x);
+    xr <- round(x);
     if(xr != x) {
       if((xr >= (-.Machine$integer.max)) && (xr <= .Machine$integer.max)) {
-        xr <- base::as.integer(xr);
+        xr <- as.integer(xr);
       }
       bestCopy[i] <- xr;
       improved <- TRUE;

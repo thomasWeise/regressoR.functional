@@ -5,8 +5,8 @@
 \title{Helper Method to Create a Transformed Fitted Functional Model}
 \usage{
 TransformedFittedFunctionalModel.new(model, par, quality,
-  transform.x = base::identity, transform.x.complexity = 0L,
-  transform.y = base::identity, transform.y.complexity = 0L)
+  transform.x = identity, transform.x.complexity = 0L,
+  transform.y = identity, transform.y.complexity = 0L)
 }
 \arguments{
 \item{model}{the model \code{\link{FunctionalModel}}}

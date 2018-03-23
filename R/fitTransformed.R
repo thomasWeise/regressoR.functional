@@ -62,46 +62,46 @@ FunctionalModel.fit.transformed <- function(metric, model,
                                   transformation.x=NULL, transformation.y=NULL,
                                   metric.transformed=NULL,
                                   par=NULL,
-                                  fitters = FunctionalModel.fit.defaultFitters(base::length(metric@x), model@paramCount)) {
+                                  fitters = FunctionalModel.fit.defaultFitters(length(metric@x), model@paramCount)) {
 
   # First we check the transformations whether they are NULL or identity
   # transformations.
-  f.x.i <- base::is.null(transformation.x);
+  f.x.i <- is.null(transformation.x);
   if(!f.x.i) {
     f.x <- transformation.x@forward;
-    f.x.i <- base::identical(f.x, identity);
+    f.x.i <- identical(f.x, identity);
   }
 
-  f.y.i <- base::is.null(transformation.y);
+  f.y.i <- is.null(transformation.y);
   if(!f.y.i) {
     f.y <- transformation.y@backward;
-    f.y.i <- base::identical(f.y, identity);
+    f.y.i <- identical(f.y, identity);
   }
 
   if(f.x.i && f.y.i) {
     # Both transformations are NULL or identity transformations
-    if(base::is.null(metric.transformed) ||
-       base::identical(metric.transformed, metric)) {
+    if(is.null(metric.transformed) ||
+       identical(metric.transformed, metric)) {
       # OK, we fit on the original, raw data. The transformations are identity
       # or NULL and the transformed metric is NULL or identical to the actual
       # metric.
       return(FunctionalModel.fit(metric=metric, model=model,par=par, fitters=fitters));
     } else {
-      base::stop("Transformed metric must be identical to actual metric or NULL if transformations are both NULL or identity.");
+      stop("Transformed metric must be identical to actual metric or NULL if transformations are both NULL or identity.");
     }
   } else {
-    if(base::is.null(metric.transformed)) {
-      base::stop("Transformed metric canot be NULL if at least one transformation is not NULL or identity.");
+    if(is.null(metric.transformed)) {
+      stop("Transformed metric canot be NULL if at least one transformation is not NULL or identity.");
     }
   }
 
   # The first fitting step takes place on the raw data.
   result <- FunctionalModel.fit(metric=metric.transformed, model=model,
                                 par=par, fitters=fitters);
-  if(base::is.null(result)) {
+  if(is.null(result)) {
     return(NULL);
   }
-  if(base::identical(metric.transformed, metric)) {
+  if(identical(metric.transformed, metric)) {
     # This is odd, the transformed metric and the metric are the same. This
     # should only happen if we fit directly on the raw data and both
     # transformations are identity transformations anyway. Anyway, we can stop
@@ -132,7 +132,7 @@ FunctionalModel.fit.transformed <- function(metric, model,
                                                                  paramUpper = model@paramUpper);
   # fit the model, starting with the current parameterization
   result.2 <- FunctionalModel.fit(metric, model.temp, par=result@par, fitters = fitters);
-  if(base::is.null(result.2)) {
+  if(is.null(result.2)) {
     # if we failed, let's see whether we can just use the original result
     result@quality <- metric@quality(f.n, result@par);
     if(learnerSelectoR::learning.checkQuality(result@quality)) {

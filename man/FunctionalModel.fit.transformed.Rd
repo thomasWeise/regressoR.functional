@@ -6,7 +6,7 @@
 \usage{
 FunctionalModel.fit.transformed(metric, model, transformation.x = NULL,
   transformation.y = NULL, metric.transformed = NULL, par = NULL,
-  fitters = FunctionalModel.fit.defaultFitters(base::length(metric@x),
+  fitters = FunctionalModel.fit.defaultFitters(length(metric@x),
   model@paramCount))
 }
 \arguments{

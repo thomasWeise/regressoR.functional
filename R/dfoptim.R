@@ -20,14 +20,14 @@
 #'   FunctionalModel.par.check
 #' @export FunctionalModel.fit.dfoptim
 FunctionalModel.fit.dfoptim <- function(metric, model, par=NULL) {
-  if(base::is.null(metric) || base::is.null(model) ) { return(NULL); }
+  if(is.null(metric) || is.null(model) ) { return(NULL); }
 
-  if(base::is.null(par)) {
+  if(is.null(par)) {
     par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric);
   }
 
   limits <- .fix.boundaries(model);
-  if(base::is.null(limits)) {
+  if(is.null(limits)) {
     lower <- NULL;
     upper <- NULL;
   } else {
@@ -38,11 +38,11 @@ FunctionalModel.fit.dfoptim <- function(metric, model, par=NULL) {
   fn <- function(par) metric@quality(model@f, par);
 
   .ignore.errors({
-    control <- base::list(maxfeval=2000);
+    control <- list(maxfeval=2000);
     result1 <- NULL;
     result2 <- NULL;
-    if(base::is.null(lower)) {
-      if(base::is.null(upper)) {
+    if(is.null(lower)) {
+      if(is.null(upper)) {
         .ignore.errors({ result1 <- dfoptim::hjk(par=par, fn=fn, control=control) });
         .ignore.errors({ result2 <- dfoptim::nmk(par=par, fn=fn, control=control) });
       } else {
@@ -50,7 +50,7 @@ FunctionalModel.fit.dfoptim <- function(metric, model, par=NULL) {
         .ignore.errors({ result2 <- dfoptim::nmkb(par=par, fn=fn, upper=upper, control=control) });
       }
     } else {
-      if(base::is.null(model@paramUpper)) {
+      if(is.null(model@paramUpper)) {
         .ignore.errors({ result1 <- dfoptim::hjkb(par=par, fn=fn, lower=lower, control=control) });
         .ignore.errors({ result2 <- dfoptim::nmkb(par=par, fn=fn, lower=lower, control=control) });
       } else {
@@ -59,9 +59,9 @@ FunctionalModel.fit.dfoptim <- function(metric, model, par=NULL) {
       }
     }
 
-    if(base::is.null(result1) && base::is.null(result2)) { return(NULL); }
+    if(is.null(result1) && is.null(result2)) { return(NULL); }
 
-    if(base::is.null(result1)) {
+    if(is.null(result1)) {
       result1par <- NULL;
       result1q <- +Inf;
     } else {
@@ -78,7 +78,7 @@ FunctionalModel.fit.dfoptim <- function(metric, model, par=NULL) {
       }
     }
 
-    if(base::is.null(result2)) {
+    if(is.null(result2)) {
       result2par <- NULL;
       result2q <- +Inf;
     } else {
@@ -95,13 +95,13 @@ FunctionalModel.fit.dfoptim <- function(metric, model, par=NULL) {
       }
     }
 
-    if(base::is.null(result1par) && base::is.null(result2par)) { return(NULL); }
+    if(is.null(result1par) && is.null(result2par)) { return(NULL); }
 
-    if(base::is.null(result1par)) {
+    if(is.null(result1par)) {
       result1par <- result2par;
       result1q <- result2q;
     } else {
-      if( (!(base::is.null(result2par))) && (result2q < result1q) ) {
+      if( (!(is.null(result2par))) && (result2q < result1q) ) {
         result1par <- result2par;
         result1q <- result2q;
       }
