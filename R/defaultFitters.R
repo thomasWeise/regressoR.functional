@@ -17,22 +17,22 @@
 # find out which fitters are available
 .fitters.make.available <- function() {
   available <- 0L;
-  if(require("cmaes")) {
+  if(base::require("cmaes")) {
     available <- available + .key.cmaes;
   }
-  if(require("minqa")) {
+  if(base::require("minqa")) {
     available <- available + .key.minqa;
   }
-  if(require("minpack.lm")) {
+  if(base::require("minpack.lm")) {
     available <- available + .key.nlslm;
   }
-  if(require("stats")) {
+  if(base::require("stats")) {
     available <- available + .key.nls;
   }
-  if(require("DEoptim")) {
+  if(base::require("DEoptim")) {
     available <- available + .key.de;
   }
-  if(require("dfoptim")) {
+  if(base::require("dfoptim")) {
     available <- available + .key.dfoptim;
   }
   return(available);
