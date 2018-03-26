@@ -7,7 +7,7 @@ test_that("Test FunctionalModel.makeLearners", {
   expect_true(is.list(learners));
   expect_gt(length(learners), 0L);
 
-  x <- rnorm(10);
+  x <- runif(10, min=1, max=10);
   params <- c(5, 7);
   func <- function(x) { params[1] + params[2]*x };
   y <- func(x);

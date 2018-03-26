@@ -1,7 +1,7 @@
 Package: regressoR.functional
 Type: Package
 Title: An R Package for Fitting Functional Models to 2-Dimensional Data
-Version: 0.8.1
+Version: 0.8.2
 Author: Dr. Thomas Weise <tweise@hfuu.edu.cn>
 Maintainer: Dr. Thomas Weise <tweise@hfuu.edu.cn>
 Description: This package provides methods for fitting a functional model
@@ -24,7 +24,7 @@ Imports: cmaes (>= 1.0.11),
          minqa (>= 1.2.4),
          methods (>= 3.3.2),
          regressoR.base (>= 0.8.2),
-         regressoR.functional.models (>= 0.8.2),
+         regressoR.functional.models (>= 0.8.4),
          regressoR.quality (>= 0.8.2),
          stats (>= 3.3.2)
 Suggests: testthat (>= 2.0.0),
