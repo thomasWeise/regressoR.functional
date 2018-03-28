@@ -87,8 +87,6 @@ FittedFunctionalModel.finalize <- function(object) {
   return(object);
 }
 
-#' @title Finalize a \code{\link{FittedFunctionalModel}}
-#' @name learning.Result.finalize
 #' @importFrom methods setMethod
 #' @importMethodsFrom learnerSelectoR learning.Result.finalize
 #' @aliases learning.Result.finalize,FittedFunctionalModel-method

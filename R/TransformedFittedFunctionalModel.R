@@ -191,8 +191,6 @@ TransformedFittedFunctionalModel.finalize <- function(object) {
   return(object);
 }
 
-#' @title Finalize a \code{\link{TransformedFittedFunctionalModel}}
-#' @name learning.Result.finalize
 #' @importFrom methods setMethod
 #' @importFrom functionComposeR function.substitute
 #' @importMethodsFrom learnerSelectoR learning.Result.finalize
