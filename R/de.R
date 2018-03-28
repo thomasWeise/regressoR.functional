@@ -22,7 +22,7 @@ FunctionalModel.fit.de <- function(metric, model, par=NULL) {
   if(is.null(metric) || is.null(model) ) { return(NULL); }
 
   if(is.null(par)) {
-    par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric@x, metric@y);
+    par <- FunctionalModel.par.estimate(model, metric@x, metric@y);
   }
 
   fn <- function(par) metric@quality(model@f, par);
@@ -48,14 +48,14 @@ FunctionalModel.fit.de <- function(metric, model, par=NULL) {
       upper <- rep(1e10 + max(abs(initialPop)), model@paramCount);
     }
 
-    result <- DEoptim::DEoptim(fn=fn, lower=lower, upper=upper,
-                      DEoptim::DEoptim.control(NP=NP, initialpop=initialPop, trace=FALSE));
+    result <- DEoptim(fn=fn, lower=lower, upper=upper,
+                      DEoptim.control(NP=NP, initialpop=initialPop, trace=FALSE));
 
     if(is.null(result) || (length(result) < 2)) { return(NULL); }
     result <- result[[1]];
     if(is.null(result) ) { return(NULL); }
-    if(!(regressoR.functional.models::FunctionalModel.par.check(model, result$bestmem))) { return(NULL); }
-    if(!(learnerSelectoR::learning.checkQuality(result$bestval))) { return(NULL); }
+    if(!(FunctionalModel.par.check(model, result$bestmem))) { return(NULL); }
+    if(!(learning.checkQuality(result$bestval))) { return(NULL); }
     return(FittedFunctionalModel.new(model, result$bestmem, result$bestval));
   });
 

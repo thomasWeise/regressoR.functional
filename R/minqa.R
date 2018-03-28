@@ -22,7 +22,7 @@ FunctionalModel.fit.minqa <- function(metric, model, par=NULL) {
   if(is.null(metric) || is.null(model) ) { return(NULL); }
 
   if(is.null(par)) {
-    par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric@x, metric@y);
+    par <- FunctionalModel.par.estimate(model, metric@x, metric@y);
   }
 
   fn <- function(par) metric@quality(model@f, par);
@@ -42,35 +42,35 @@ FunctionalModel.fit.minqa <- function(metric, model, par=NULL) {
     .ignore.errors({
       if(is.null(lower)) {
         if(is.null(upper)) {
-          result <- minqa::bobyqa(par=par, fn=fn);
+          result <- bobyqa(par=par, fn=fn);
         } else {
-          result <- minqa::bobyqa(par=par, fn=fn, upper=upper);
+          result <- bobyqa(par=par, fn=fn, upper=upper);
         }
       } else {
         if(is.null(upper)) {
-          result <- minqa::bobyqa(par=par, fn=fn, lower=lower);
+          result <- bobyqa(par=par, fn=fn, lower=lower);
         } else {
-          result <- minqa::bobyqa(par=par, fn=fn, lower=lower, upper=upper);
+          result <- bobyqa(par=par, fn=fn, lower=lower, upper=upper);
         }
       }
       });
 
     if(!is.null(result)) {
       resultpar <- result$par;
-      if(regressoR.functional.models::FunctionalModel.par.check(model, resultpar)) {
+      if(FunctionalModel.par.check(model, resultpar)) {
         resultq <- result$fval;
-        if(learnerSelectoR::learning.checkQuality(resultq)) {
+        if(learning.checkQuality(resultq)) {
           return(FittedFunctionalModel.new(model, resultpar, resultq));
         }
       }
     }
 
-    result <- minqa::newuoa(par=par, fn=fn);
+    result <- newuoa(par=par, fn=fn);
     if(!is.null(result)) {
       resultpar <- result$par;
-      if(regressoR.functional.models::FunctionalModel.par.check(model, resultpar)) {
+      if(FunctionalModel.par.check(model, resultpar)) {
         resultq <- result$fval;
-        if(learnerSelectoR::learning.checkQuality(resultq)) {
+        if(learning.checkQuality(resultq)) {
           return(FittedFunctionalModel.new(model, resultpar, resultq));
         }
       }

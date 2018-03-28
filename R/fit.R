@@ -17,7 +17,7 @@
 #' finishing the fitting, we attempt whether rounding the fitted parameters to
 #' integers can improve the fitting quality.
 #'
-#' @param metric an instance of \code{regressoR.quality::RegressionQualityMetric}
+#' @param metric an instance of \code{RegressionQualityMetric}
 #' @param model an instance of \code{\link{FunctionalModel}}
 #' @param par the initial starting point
 #' @param fitters the fitters
@@ -36,7 +36,7 @@
 #' y <- fx(x);
 #' model <- regressoR.functional.models::FunctionalModel.quadratic();
 #' metric1 <- regressoR.quality::RegressionQualityMetric.default(x, y);
-#' res1 <- regressoR.functional::FunctionalModel.fit(metric1, model);
+#' res1 <- FunctionalModel.fit(metric1, model);
 #' res1@quality
 #' # [1] 0
 #' res1@par
@@ -45,7 +45,7 @@
 #' xr <- x + 0.1*rnorm(length(x));
 #' yr <- y + 0.1*rnorm(length(y));
 #' metric2 <- regressoR.quality::RegressionQualityMetric.default(xr, yr);
-#' res2 <- regressoR.functional::FunctionalModel.fit(metric2, model);
+#' res2 <- FunctionalModel.fit(metric2, model);
 #' res2@quality
 #' # [1] 0.2439082
 #' res2@par
@@ -57,11 +57,11 @@ FunctionalModel.fit <- function(metric, model, par=NULL,
   fitterCount <- length(fitters);
   if(fitterCount <= 0L) { return(NULL); }
 
-  # get a starting point
-  bestParams <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric@x, metric@y, par);
-  if(regressoR.functional.models::FunctionalModel.par.check(model, bestParams)) {
+  # if a starting point is provided, check and evaluate it
+  bestParams <- par;
+  if(FunctionalModel.par.check(model, bestParams)) {
     bestQuality <- metric@quality(model@f, bestParams);
-    if(!(learnerSelectoR::learning.checkQuality(bestQuality))) {
+    if(!(learning.checkQuality(bestQuality))) {
       bestQuality <- +Inf;
       bestParams <- NULL;
     }
@@ -110,7 +110,7 @@ FunctionalModel.fit <- function(metric, model, par=NULL,
   }
 
   if(is.null(bestResult) &&
-     regressoR.functional.models::FunctionalModel.par.check(model, bestParams) &&
+     FunctionalModel.par.check(model, bestParams) &&
      learning.checkQuality(bestQuality)) {
     # strange, ok, let's try to build a new solution
     return(FittedFunctionalModel.new(model, bestParams, bestQuality));
@@ -135,9 +135,9 @@ FunctionalModel.fit <- function(metric, model, par=NULL,
           xr <- as.integer(xr);
         }
         bestCopy[i] <- xr;
-        if(regressoR.functional.models::FunctionalModel.par.check(model, bestCopy)) {
+        if(FunctionalModel.par.check(model, bestCopy)) {
           test <- metric@quality(model@f, bestCopy);
-          if(learnerSelectoR::learning.checkQuality(test) && (test <= bestQuality)) {
+          if(learning.checkQuality(test) && (test <= bestQuality)) {
             bestQuality <- test;
             bestParams <- bestCopy;
             changed <- TRUE;
@@ -160,9 +160,9 @@ FunctionalModel.fit <- function(metric, model, par=NULL,
       improved <- TRUE;
     }
   }
-  if(improved && regressoR.functional.models::FunctionalModel.par.check(model, bestCopy)) {
+  if(improved && FunctionalModel.par.check(model, bestCopy)) {
     test <- metric@quality(model@f, bestCopy);
-    if(learnerSelectoR::learning.checkQuality(test) && (test <= bestQuality)) {
+    if(learning.checkQuality(test) && (test <= bestQuality)) {
       bestQuality <- test;
       bestParams <- bestCopy;
       changed <- TRUE;

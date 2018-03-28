@@ -16,17 +16,17 @@
 #' @importClassesFrom regressoR.base FittedModel
 #' @importFrom regressoR.functional.models FunctionalModel.par.check
 #' @seealso FittedFunctionalModel.new
-FittedFunctionalModel <- methods::setClass(
+FittedFunctionalModel <- setClass(
   Class = "FittedFunctionalModel",
   contains = "FittedModel",
-  representation = methods::representation(model="FunctionalModel",
+  representation = representation(model="FunctionalModel",
                                            par="numeric"),
   validity = function(object) {
     if (is.null(object@model) ||
-       (!(methods::is(object@model, "FunctionalModel")))) {
+       (!(is(object@model, "FunctionalModel")))) {
       return("Model model must be properly defined.");
     }
-    methods::validObject(object@model);
+    validObject(object@model);
     if(!(FunctionalModel.par.check(object@model, object@par))) {
       return("Model parameters cannot be null and must match the number of parameters and constraints specified in model.");
     }
@@ -58,7 +58,7 @@ FittedFunctionalModel.new <- function(model, par, quality) {
   par <- force(unname(par));
   fn <- function(x) f(x, par);
 
-  result <- methods::new("FittedFunctionalModel",
+  result <- new("FittedFunctionalModel",
                          model=model, par=par, quality=quality, f=fn,
                          size=model@paramCount);
   result <- force(result);
@@ -68,7 +68,7 @@ FittedFunctionalModel.new <- function(model, par, quality) {
   result@quality <- force(result@quality);
   result <- force(result);
 
-  methods::validObject(result);
+  validObject(result);
   return(result);
 }
 
@@ -82,22 +82,17 @@ FittedFunctionalModel.new <- function(model, par, quality) {
 #' @export FittedFunctionalModel.finalize
 FittedFunctionalModel.finalize <- function(object) {
   object <- force(object);
-  object@f <- functionComposeR::function.substitute(object@model@f, list(par=object@par));
+  object@f <- function.substitute(object@model@f, list(par=object@par));
   object@f <- force(object@f);
   return(object);
 }
 
-#' @title Finalize a Fitted Functional Model
-#' @description This method makes sure that the created instance of
-#'   \code{\link{FittedFunctionalModel}} is fully finalized. This involves
-#'   substituting the function parameter into the function.
+#' @title Finalize a \code{\link{FittedFunctionalModel}}
 #' @name learning.Result.finalize
-#' @param object the fitted model to be finalized
-#' @return a \code{\link{FittedFunctionalModel}}
 #' @importFrom methods setMethod
 #' @importMethodsFrom learnerSelectoR learning.Result.finalize
 #' @aliases learning.Result.finalize,FittedFunctionalModel-method
-methods::setMethod(
+setMethod(
   f="learning.Result.finalize",
   signature="FittedFunctionalModel",
   definition=FittedFunctionalModel.finalize)

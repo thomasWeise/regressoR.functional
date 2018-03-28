@@ -11,7 +11,7 @@ FunctionalModel.fit.transformed(metric, model, transformation.x = NULL,
 }
 \arguments{
 \item{metric}{an instance of
-\code{regressoR.quality::RegressionQualityMetric}}
+\code{RegressionQualityMetric}}
 
 \item{model}{an instance of \code{\link{FunctionalModel}}}
 
@@ -60,7 +60,8 @@ transformed.data <- dataTransformeR::TransformedData2D.new(
   dataTransformeR::Transformation.log(noisy.y));
 
 metric <- regressoR.quality::RegressionQualityMetric.default(noisy.x, noisy.y);
-metric.transformed <- regressoR.quality::RegressionQualityMetric.default(transformed.data@x@data,
+metric.transformed <- regressoR.quality::RegressionQualityMetric.default(
+                                                 transformed.data@x@data,
                                                  transformed.data@y@data);
 model <- regressoR.functional.models::FunctionalModel.quadratic();
 result <- FunctionalModel.fit.transformed(metric, model,

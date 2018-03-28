@@ -22,7 +22,7 @@ FunctionalModel.fit.cmaes <- function(metric, model, par=NULL) {
   if(is.null(metric) || is.null(model) ) { return(NULL); }
 
   if(is.null(par)) {
-    par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric@x, metric@y);
+    par <- FunctionalModel.par.estimate(model, metric@x, metric@y);
   }
 
   fn <- function(par) metric@quality(model@f, par);
@@ -39,21 +39,21 @@ FunctionalModel.fit.cmaes <- function(metric, model, par=NULL) {
   .ignore.errors({
     if(is.null(lower)) {
       if(is.null(upper)) {
-        result <- cmaes::cma_es(par=par, fn=fn);
+        result <- cma_es(par=par, fn=fn);
       } else {
-        result <- cmaes::cma_es(par=par, fn=fn, upper=upper);
+        result <- cma_es(par=par, fn=fn, upper=upper);
       }
     } else {
       if(is.null(upper)) {
-        result <- cmaes::cma_es(par=par, fn=fn, lower=lower);
+        result <- cma_es(par=par, fn=fn, lower=lower);
       } else {
-        result <- cmaes::cma_es(par=par, fn=fn, lower=lower, upper=upper);
+        result <- cma_es(par=par, fn=fn, lower=lower, upper=upper);
       }
     }
 
     if(is.null(result)) { return(NULL); }
-    if(!(regressoR.functional.models::FunctionalModel.par.check(model, result$par))) { return(NULL); }
-    if(!(learnerSelectoR::learning.checkQuality(result$value))) { return(NULL); }
+    if(!(FunctionalModel.par.check(model, result$par))) { return(NULL); }
+    if(!(learning.checkQuality(result$value))) { return(NULL); }
     return(FittedFunctionalModel.new(model, result$par, result$value));
   });
 

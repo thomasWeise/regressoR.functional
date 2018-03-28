@@ -43,9 +43,9 @@
   # Let's first randomly sample the current population based on the par vector
   pop <- matrix(sapply(X=par, FUN = function(x) {
     if(x != 0) {
-      return(stats::rnorm(n=NP, mean=x, sd=0.1*abs(x)))
+      return(rnorm(n=NP, mean=x, sd=0.1*abs(x)))
     } else {
-      return(exp(stats::rnorm(n=NP, sd=2)) * stats::rnorm(n=NP)); }
+      return(exp(rnorm(n=NP, sd=2)) * rnorm(n=NP)); }
   }),
   ncol=paramCount, nrow=NP);
 

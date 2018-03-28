@@ -17,7 +17,7 @@
 #' quality.
 #'
 #' @param metric an instance of
-#'   \code{regressoR.quality::RegressionQualityMetric}
+#'   \code{RegressionQualityMetric}
 #' @param model an instance of \code{\link{FunctionalModel}}
 #' @param par the initial starting point
 #' @param fitters the fitters
@@ -47,7 +47,8 @@
 #'   dataTransformeR::Transformation.log(noisy.y));
 #'
 #' metric <- regressoR.quality::RegressionQualityMetric.default(noisy.x, noisy.y);
-#' metric.transformed <- regressoR.quality::RegressionQualityMetric.default(transformed.data@x@data,
+#' metric.transformed <- regressoR.quality::RegressionQualityMetric.default(
+#'                                                  transformed.data@x@data,
 #'                                                  transformed.data@y@data);
 #' model <- regressoR.functional.models::FunctionalModel.quadratic();
 #' result <- FunctionalModel.fit.transformed(metric, model,
@@ -127,15 +128,16 @@ FunctionalModel.fit.transformed <- function(metric, model,
   }
 
   # create a temporary model for the fitting procedure
-  model.temp <- regressoR.functional.models::FunctionalModel.new(f=f.n, paramCount = model@paramCount,
-                                                                 paramLower=model@paramLower,
-                                                                 paramUpper = model@paramUpper);
+  model.temp <- FunctionalModel.new(f=f.n, paramCount = model@paramCount,
+                                           paramLower=model@paramLower,
+                                           paramUpper = model@paramUpper,
+                                           name=model@name);
   # fit the model, starting with the current parameterization
   result.2 <- FunctionalModel.fit(metric, model.temp, par=result@par, fitters = fitters);
   if(is.null(result.2)) {
     # if we failed, let's see whether we can just use the original result
     result@quality <- metric@quality(f.n, result@par);
-    if(learnerSelectoR::learning.checkQuality(result@quality)) {
+    if(learning.checkQuality(result@quality)) {
       # ok, we can
       return(result);
     }

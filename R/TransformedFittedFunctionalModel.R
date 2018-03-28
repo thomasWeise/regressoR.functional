@@ -14,11 +14,11 @@
 #' @exportClass TransformedFittedFunctionalModel
 #' @importFrom methods setClass representation
 #' @seealso TransformedFittedFunctionalModel.new
-TransformedFittedFunctionalModel <- methods::setClass(
+TransformedFittedFunctionalModel <- setClass(
   Class = "TransformedFittedFunctionalModel",
   contains = "FittedFunctionalModel",
-  representation = methods::representation(transform.x="function",
-                                           transform.y="function"),
+  representation = representation(transform.x="function",
+                                  transform.y="function"),
   validity = function(object) {
     # check transform.x function
     if(is.null(object@transform.x) ||
@@ -131,7 +131,7 @@ TransformedFittedFunctionalModel.new <- function(model, par, quality,
   }
 
   # create
-  result <- methods::new("TransformedFittedFunctionalModel",
+  result <- new("TransformedFittedFunctionalModel",
                          model=model,
                          par=par, quality=quality, f=fn,
                          transform.x = transform.x,
@@ -147,7 +147,7 @@ TransformedFittedFunctionalModel.new <- function(model, par, quality,
   result@transform.y <- force(result@transform.y);
   result <- force(result);
 
-  methods::validObject(result);
+  validObject(result);
   return(result);
 }
 
@@ -191,18 +191,13 @@ TransformedFittedFunctionalModel.finalize <- function(object) {
   return(object);
 }
 
-#' @title Finalize a Fitted Transformed Functional Model
-#' @description This method makes sure that the created instance of
-#'   \code{\link{TransformedFittedFunctionalModel}} is fully finalized. This
-#'   involves substituting the function parameter into the function.
+#' @title Finalize a \code{\link{TransformedFittedFunctionalModel}}
 #' @name learning.Result.finalize
-#' @param object the fitted model to be finalized
-#' @return a \code{\link{TransformedFittedFunctionalModel}}
 #' @importFrom methods setMethod
 #' @importFrom functionComposeR function.substitute
 #' @importMethodsFrom learnerSelectoR learning.Result.finalize
 #' @aliases learning.Result.finalize,TransformedFittedFunctionalModel-method
-methods::setMethod(
+setMethod(
   f="learning.Result.finalize",
   signature = "TransformedFittedFunctionalModel",
   definition = TransformedFittedFunctionalModel.finalize)

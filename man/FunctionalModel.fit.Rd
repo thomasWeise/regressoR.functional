@@ -9,7 +9,7 @@ FunctionalModel.fit(metric, model, par = NULL,
   model@paramCount))
 }
 \arguments{
-\item{metric}{an instance of \code{regressoR.quality::RegressionQualityMetric}}
+\item{metric}{an instance of \code{RegressionQualityMetric}}
 
 \item{model}{an instance of \code{\link{FunctionalModel}}}
 
@@ -44,7 +44,7 @@ fx <- function(x) fxpar(x, par);
 y <- fx(x);
 model <- regressoR.functional.models::FunctionalModel.quadratic();
 metric1 <- regressoR.quality::RegressionQualityMetric.default(x, y);
-res1 <- regressoR.functional::FunctionalModel.fit(metric1, model);
+res1 <- FunctionalModel.fit(metric1, model);
 res1@quality
 # [1] 0
 res1@par
@@ -53,7 +53,7 @@ res1@par
 xr <- x + 0.1*rnorm(length(x));
 yr <- y + 0.1*rnorm(length(y));
 metric2 <- regressoR.quality::RegressionQualityMetric.default(xr, yr);
-res2 <- regressoR.functional::FunctionalModel.fit(metric2, model);
+res2 <- FunctionalModel.fit(metric2, model);
 res2@quality
 # [1] 0.2439082
 res2@par

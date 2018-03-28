@@ -13,7 +13,7 @@
 #' @param par the initial starting point
 #' @return On success, an instance of \code{\link{FittedFunctionalModel}}.
 #'   \code{NULL} on failure.
-#' @importFrom dfoptim hjk nmk
+#' @importFrom dfoptim hjk nmk hjkb nmkb
 #' @importFrom learnerSelectoR learning.checkQuality
 #' @importClassesFrom regressoR.quality RegressionQualityMetric
 #' @importFrom regressoR.functional.models FunctionalModel.par.estimate
@@ -23,7 +23,7 @@ FunctionalModel.fit.dfoptim <- function(metric, model, par=NULL) {
   if(is.null(metric) || is.null(model) ) { return(NULL); }
 
   if(is.null(par)) {
-    par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric@x, metric@y);
+    par <- FunctionalModel.par.estimate(model, metric@x, metric@y);
   }
 
   limits <- .fix.boundaries(model);
@@ -43,19 +43,19 @@ FunctionalModel.fit.dfoptim <- function(metric, model, par=NULL) {
     result2 <- NULL;
     if(is.null(lower)) {
       if(is.null(upper)) {
-        .ignore.errors({ result1 <- dfoptim::hjk(par=par, fn=fn, control=control) });
-        .ignore.errors({ result2 <- dfoptim::nmk(par=par, fn=fn, control=control) });
+        .ignore.errors({ result1 <- hjk(par=par, fn=fn, control=control) });
+        .ignore.errors({ result2 <- nmk(par=par, fn=fn, control=control) });
       } else {
-        .ignore.errors({ result1 <- dfoptim::hjkb(par=par, fn=fn, upper=upper, control=control) });
-        .ignore.errors({ result2 <- dfoptim::nmkb(par=par, fn=fn, upper=upper, control=control) });
+        .ignore.errors({ result1 <- hjkb(par=par, fn=fn, upper=upper, control=control) });
+        .ignore.errors({ result2 <- nmkb(par=par, fn=fn, upper=upper, control=control) });
       }
     } else {
       if(is.null(model@paramUpper)) {
-        .ignore.errors({ result1 <- dfoptim::hjkb(par=par, fn=fn, lower=lower, control=control) });
-        .ignore.errors({ result2 <- dfoptim::nmkb(par=par, fn=fn, lower=lower, control=control) });
+        .ignore.errors({ result1 <- hjkb(par=par, fn=fn, lower=lower, control=control) });
+        .ignore.errors({ result2 <- nmkb(par=par, fn=fn, lower=lower, control=control) });
       } else {
-        .ignore.errors({ result1 <- dfoptim::hjkb(par=par, fn=fn, lower=lower, upper=upper, control=control) });
-        .ignore.errors({ result2 <- dfoptim::nmkb(par=par, fn=fn, lower=lower, upper=upper, control=control) });
+        .ignore.errors({ result1 <- hjkb(par=par, fn=fn, lower=lower, upper=upper, control=control) });
+        .ignore.errors({ result2 <- nmkb(par=par, fn=fn, lower=lower, upper=upper, control=control) });
       }
     }
 
@@ -66,12 +66,12 @@ FunctionalModel.fit.dfoptim <- function(metric, model, par=NULL) {
       result1q <- +Inf;
     } else {
       result1par <- result1$par;
-      if(!(regressoR.functional.models::FunctionalModel.par.check(model, result1par))) {
+      if(!(FunctionalModel.par.check(model, result1par))) {
         result1par <- NULL;
         result1q <- +Inf;
       } else {
         result1q <- result1$value;
-        if(!(learnerSelectoR::learning.checkQuality(result1q))) {
+        if(!(learning.checkQuality(result1q))) {
           result1par <- NULL;
           result1q <- +Inf;
         }
@@ -83,12 +83,12 @@ FunctionalModel.fit.dfoptim <- function(metric, model, par=NULL) {
       result2q <- +Inf;
     } else {
       result2par <- result2$par;
-      if(!(regressoR.functional.models::FunctionalModel.par.check(model, result2par))) {
+      if(!(FunctionalModel.par.check(model, result2par))) {
         result2par <- NULL;
         result2q <- +Inf;
       } else {
         result2q <- result2$value;
-        if(!(learnerSelectoR::learning.checkQuality(result2q))) {
+        if(!(learning.checkQuality(result2q))) {
           result2par <- NULL;
           result2q <- +Inf;
         }

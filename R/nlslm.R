@@ -24,7 +24,7 @@ FunctionalModel.fit.nlslm <- function(metric, model, par=NULL) {
      is.null(metric@residuals)) { return(NULL); }
 
   if(is.null(par)) {
-    par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric@x, metric@y);
+    par <- FunctionalModel.par.estimate(model, metric@x, metric@y);
   }
 
   fn <- function(par) metric@residuals(model@f, par);
@@ -45,12 +45,12 @@ FunctionalModel.fit.nlslm <- function(metric, model, par=NULL) {
   }
 
   .ignore.errors({
-    result <- minpack.lm::nls.lm(par=par, lower=lower, upper=upper, fn=fn, jac=jac);
+    result <- nls.lm(par=par, lower=lower, upper=upper, fn=fn, jac=jac);
     if(is.null(result)) { return(NULL); }
-    if(!(regressoR.functional.models::FunctionalModel.par.check(model, result$par))) { return(NULL); }
+    if(!(FunctionalModel.par.check(model, result$par))) { return(NULL); }
     if(!(is.finite(result$deviance))) { return(NULL); }
     quality <- metric@quality(model@f, result$par);
-    if(!(learnerSelectoR::learning.checkQuality(quality))) { return(NULL); }
+    if(!(learning.checkQuality(quality))) { return(NULL); }
     return(FittedFunctionalModel.new(model, result$par, quality));
   });
 
