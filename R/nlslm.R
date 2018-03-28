@@ -24,7 +24,7 @@ FunctionalModel.fit.nlslm <- function(metric, model, par=NULL) {
      is.null(metric@residuals)) { return(NULL); }
 
   if(is.null(par)) {
-    par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric);
+    par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric@x, metric@y);
   }
 
   fn <- function(par) metric@residuals(model@f, par);

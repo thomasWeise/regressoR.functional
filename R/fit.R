@@ -58,7 +58,7 @@ FunctionalModel.fit <- function(metric, model, par=NULL,
   if(fitterCount <= 0L) { return(NULL); }
 
   # get a starting point
-  bestParams <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric, par);
+  bestParams <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric@x, metric@y, par);
   if(regressoR.functional.models::FunctionalModel.par.check(model, bestParams)) {
     bestQuality <- metric@quality(model@f, bestParams);
     if(!(learnerSelectoR::learning.checkQuality(bestQuality))) {

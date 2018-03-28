@@ -23,7 +23,7 @@ FunctionalModel.fit.dfoptim <- function(metric, model, par=NULL) {
   if(is.null(metric) || is.null(model) ) { return(NULL); }
 
   if(is.null(par)) {
-    par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric);
+    par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric@x, metric@y);
   }
 
   limits <- .fix.boundaries(model);

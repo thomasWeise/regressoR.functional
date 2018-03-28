@@ -22,7 +22,7 @@ FunctionalModel.fit.de <- function(metric, model, par=NULL) {
   if(is.null(metric) || is.null(model) ) { return(NULL); }
 
   if(is.null(par)) {
-    par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric);
+    par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric@x, metric@y);
   }
 
   fn <- function(par) metric@quality(model@f, par);

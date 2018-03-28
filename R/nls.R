@@ -26,7 +26,7 @@ FunctionalModel.fit.nls <- function(metric, model, par=NULL) {
      is.null(metric@x) || is.null(metric@y)) { return(NULL); }
 
   if(is.null(par)) {
-    par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric);
+    par <- regressoR.functional.models::FunctionalModel.par.estimate(model, metric@x, metric@y);
   }
 
   .ignore.errors({
