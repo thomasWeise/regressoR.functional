@@ -56,21 +56,19 @@ FunctionalModel.fit.defaultFitters <- function(dataSize = 1000, paramCount = 4) 
 
   complexity <- (dataSize * paramCount * paramCount);
 
-  # nls is fast but has comparatively bad results, so for bigger problems we won't use it,
-  # especially if we have nlslm or the complexity is very big
-  if( (complexity > 10000L) &&
-     ((complexity > 30000L) || (bitwAnd(usage, .key.nlslm) == .key.nlslm))) {
-    usage <- bitwAnd(usage, bitwNot(.key.nls));
-  }
+  # nls is fast, if it is available, we always use it
 
   # cmaes gives by far the best results, but is also very slow, so we can only use it for small problems
   if(complexity > 600L) {
     usage <- bitwAnd(usage, bitwNot(.key.cmaes));
   }
 
-  # de is about as good as nlsm, but maybe 10 times as slow
-  if( (complexity > 4500L) &&
-     ((complexity > 8000L) || (bitwAnd(usage, .key.nlslm) == .key.nlslm))) {
+  # DE is about as good as nlsm, but slower
+  # On the other hand, DE is the only method where we can directly initialize the population.
+  # Doing so allows us to potentially better solve problems where most starting points are bad,
+  # since we simply sample more.
+  # Hence, we use DE unless the problem is very big.
+  if(complexity > 100000L) {
     usage <- bitwAnd(usage, bitwNot(.key.cmaes));
   }
 

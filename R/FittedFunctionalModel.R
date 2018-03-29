@@ -90,7 +90,6 @@ FittedFunctionalModel.finalize <- function(object) {
 #' @importFrom methods setMethod
 #' @importMethodsFrom learnerSelectoR learning.Result.finalize
 #' @aliases learning.Result.finalize,FittedFunctionalModel-method
-#' @rdname learning.Result.finalize
 setMethod(
   f="learning.Result.finalize",
   signature="FittedFunctionalModel",

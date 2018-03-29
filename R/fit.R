@@ -52,127 +52,94 @@
 #' # [1]  3.919365 -2.938202  1.998102
 FunctionalModel.fit <- function(metric, model, par=NULL,
                                 fitters = FunctionalModel.fit.defaultFitters(length(metric@x), model@paramCount)) {
+  #  is the input data valid?
   if(is.null(metric) || is.null(model) || is.null(fitters)) { return(NULL); }
 
+  # do we even have any fitter?
   fitterCount <- length(fitters);
   if(fitterCount <= 0L) { return(NULL); }
 
-  # if a starting point is provided, check and evaluate it
-  bestParams <- par;
-  if(FunctionalModel.par.check(model, bestParams)) {
-    bestQuality <- metric@quality(model@f, bestParams);
-    if(!(learning.checkQuality(bestQuality))) {
-      bestQuality <- +Inf;
-      bestParams <- NULL;
+  # initialize best holders
+  bestQuality <- +Inf;
+  bestParams  <- NULL;
+  bestResult  <- NULL;
+
+  # let's check if there is a valid starting point
+  if(FunctionalModel.par.check(model, par)) {
+    # ok, there is one, but is it valid?
+    q <- metric@quality(model@f, par);
+    if(learning.checkQuality(bestQuality)) {
+      # yets it is
+      bestQuality <- q;
+      bestParams  <- par;
     }
-  } else {
-    bestQuality <- Inf;
-    bestParams <- NULL;
-  }
-  bestResult <- NULL;
-
-  # we can apply all algorithms
-  canUse <- rep(TRUE, fitterCount);
-
-  # apply a fitter
-  applyFunc <- function(index) {
-    if(canUse[index]) {
-      res <- (fitters[[index]](metric=metric, model=model,
-                               par=bestParams));
-      if((!(is.null(res))) && (res@quality < bestQuality)) {
-        return(res);
-      }
-    }
-    return(NULL);
   }
 
-  # In the next iteration, we only apply fitters which did not already see the current solution
-  canUseFun <- function(x) (is.null(x) || (x@quality > bestQuality))
-
-  improved = TRUE;
-  while(improved) {
-    # apply all fitters
-    current <- sapply(X=1L:fitterCount, FUN=applyFunc);
-
-    # was there any improvement?
-    improved = FALSE;
-    for(res in current) {
-      if((!(is.null(res))) && (res@quality < bestQuality)) {
-        improved = TRUE;
-        bestResult <- res;
-        bestQuality <- res@quality;
-        bestParams <- res@par;
-      }
-    }
-
-    # was there any fitter that did not yet receive the current solution as input?
-    canUse <- vapply(X=current, FUN=canUseFun, FUN.VALUE = FALSE);
+  # if we do not have a valid start point, give each algorithm 3 trials
+  if(is.null(bestParams)) {
+    times <- 3L;
+  } else { # if we have a start point, only 1 trial
+    times <- 1L;
   }
 
-  if(is.null(bestResult) &&
-     FunctionalModel.par.check(model, bestParams) &&
-     learning.checkQuality(bestQuality)) {
-    # strange, ok, let's try to build a new solution
-    return(FittedFunctionalModel.new(model, bestParams, bestQuality));
-  }
+  improved        <- TRUE;
+  fitterQualities <- rep(+Inf, fitterCount);
 
-  if(is.null(bestResult)) {
-    # No dice: we simply could not make the model fit in any way
-    return(NULL);
-  }
-
-  # OK, now we try to integer-fy all parameters
-  bestCopy <- bestParams;
-  changed <- FALSE;
-  improved <- TRUE;
+  # if par==NULL, this cycle will loop at least two times
   while(improved) {
     improved <- FALSE;
-    for(i in 1:length(bestParams)) {
-      x <- bestParams[i];
-      xr <- round(x);
-      if(xr != x) {
-        if((xr >= (-.Machine$integer.max)) && (xr <= .Machine$integer.max)) {
-          xr <- as.integer(xr);
-        }
-        bestCopy[i] <- xr;
-        if(FunctionalModel.par.check(model, bestCopy)) {
-          test <- metric@quality(model@f, bestCopy);
-          if(learning.checkQuality(test) && (test <= bestQuality)) {
-            bestQuality <- test;
-            bestParams <- bestCopy;
-            changed <- TRUE;
-            improved <- TRUE;
+
+    # apply all fitters
+    for(i in 1L:fitterCount) {
+      # apply a fitter iff it did not YET see the best solution so far
+      if((!(is.finite(bestQuality))) || (fitterQualities[i] > bestQuality)) {
+        # we apply it then either once or three times
+        for(j in 1L:times) {
+          # call the fitter
+          res <- fitters[[i]](metric=metric, model=model, par=bestParams);
+          # check the result
+          if(!(is.null(res))) {
+            if(res@quality < fitterQualities[i]) {
+              # the new best solution seen by the fitter
+              fitterQualities[i] <- res@quality;
+            }
+            # but is this maybe even the best result so far?
+            if(is.null(bestResult) || (res@quality < bestResult@quality)) {
+              bestResult <- res;
+              improved   <- TRUE; # yes, we made an improvement!
+            }
           }
         }
       }
     }
-  }
-  # now let's try all parameters at once
-  improved <- FALSE;
-  for(i in 1:length(bestParams)) {
-    x <- bestParams[i];
-    xr <- round(x);
-    if(xr != x) {
-      if((xr >= (-.Machine$integer.max)) && (xr <= .Machine$integer.max)) {
-        xr <- as.integer(xr);
-      }
-      bestCopy[i] <- xr;
-      improved <- TRUE;
+
+    # if we get here but did not see any valid result, we can as well give up
+    if(is.null(bestResult)) { break; }
+
+    # if the best result's quality is not better than what we had last time, we
+    # can also stop
+    if(bestResult@quality >= bestQuality) {
+      bestResult <- NULL;
+      break;
     }
-  }
-  if(improved && FunctionalModel.par.check(model, bestCopy)) {
-    test <- metric@quality(model@f, bestCopy);
-    if(learning.checkQuality(test) && (test <= bestQuality)) {
-      bestQuality <- test;
-      bestParams <- bestCopy;
-      changed <- TRUE;
-    }
+
+    # ok, we have an improvement, use the current best as starting point for the
+    # next iteration
+    bestQuality <- bestResult@quality;
+    bestParams  <- bestResult@par;
+    times       <- 1L;
   }
 
-  if(changed) {
-    # OK, we have improved upon the result, return it.
+  # there was no improvement or even no valid result
+  if(is.null(bestResult) &&
+     FunctionalModel.par.check(model, bestParams) &&
+     learning.checkQuality(bestQuality)) {
+    # strange, ok, let's try to build a new solution
+    # this could happen if we have a valid starting point which is somehow
+    # surrounded by only invalid solutions
     return(FittedFunctionalModel.new(model, bestParams, bestQuality));
   }
 
+  # best result is either something good or NULL
   return(bestResult);
 }

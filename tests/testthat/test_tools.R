@@ -87,8 +87,10 @@ test_that("Test .fix.boundaries with lower boundaries partially specified", {
 
 
 test_that("Test .make.initial.pop works correctly", {
+  models <- regressoR.functional.models::FunctionalModel.all();
   for(i in 1:50) {
-    n <- as.integer(runif(n=1, min=2, max=8));
+    model <- models[[max(1, min(length(models), as.integer(runif(n=1, min=1, max=length(models+1)))))]];
+    n <- model@paramCount;
     NP <- as.integer(runif(n=1, min=2, max=20));
 
     if(runif(1) > 0.5) {
@@ -113,10 +115,11 @@ test_that("Test .make.initial.pop works correctly", {
     }
 
     pop = .make.initial.pop( runif(n=n, min=-200, max=200),
+                             runif(n=n, min=-200, max=200),
                              lower=lower,
                              upper=upper,
                              NP=NP,
-                             paramCount=n)
+                             model=model)
 
     for(j in 1:NP) {
       x <- pop[j,];

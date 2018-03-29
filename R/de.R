@@ -21,10 +21,6 @@
 FunctionalModel.fit.de <- function(metric, model, par=NULL) {
   if(is.null(metric) || is.null(model) ) { return(NULL); }
 
-  if(is.null(par)) {
-    par <- FunctionalModel.par.estimate(model, metric@x, metric@y);
-  }
-
   fn <- function(par) metric@quality(model@f, par);
 
   limits <- .fix.boundaries(model);
@@ -36,10 +32,10 @@ FunctionalModel.fit.de <- function(metric, model, par=NULL) {
     upper <- limits$upper;
   }
 
-  NP <- 10L*model@paramCount;
+  NP <- 10L * model@paramCount; # required by DE library
 
   .ignore.errors({
-    initialPop <- .make.initial.pop(par, lower, upper, NP, model@paramCount);
+    initialPop <- .make.initial.pop(par, metric@x, metric@y, lower, upper, NP, model);
 
     if(is.null(lower)) {
       lower <- rep(-1e10 - max(abs(initialPop)), model@paramCount);
