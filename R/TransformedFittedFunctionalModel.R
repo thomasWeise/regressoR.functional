@@ -192,9 +192,9 @@ TransformedFittedFunctionalModel.finalize <- function(object) {
 }
 
 #' @importFrom methods setMethod
-#' @importFrom functionComposeR function.substitute
 #' @importMethodsFrom learnerSelectoR learning.Result.finalize
 #' @aliases learning.Result.finalize,TransformedFittedFunctionalModel-method
+#' @rdname learning.Result.finalize
 setMethod(
   f="learning.Result.finalize",
   signature = "TransformedFittedFunctionalModel",

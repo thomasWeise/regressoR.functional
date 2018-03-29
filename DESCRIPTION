@@ -15,17 +15,17 @@ LazyData: true
 URL: http://www.github.com/thomasWeise/regressoR.functional
 BugReports: http://www.github.com/thomasWeise/regressoR.functional/issues
 Imports: cmaes (>= 1.0.11),
-         dataTransformeR (>= 0.8.7),
+         dataTransformeR (>= 0.8.8),
          DEoptim (>= 2.2.4),
          dfoptim (>= 2017.12.1),
-         functionComposeR (>= 0.8.7),
-         learnerSelectoR (>= 0.8.4),
+         functionComposeR (>= 0.8.8),
+         learnerSelectoR (>= 0.8.5),
          minpack.lm (>= 1.2.1),
          minqa (>= 1.2.4),
          methods (>= 3.3.2),
-         regressoR.base (>= 0.8.2),
+         regressoR.base (>= 0.8.3),
          regressoR.functional.models (>= 0.8.8),
-         regressoR.quality (>= 0.8.2),
+         regressoR.quality (>= 0.8.3),
          stats (>= 3.3.2)
 Suggests: testthat (>= 2.0.0),
           roxygen2 (>= 6.0.1)
