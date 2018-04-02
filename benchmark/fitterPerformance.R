@@ -12,12 +12,11 @@ set.seed(2500234L);
 minDataSize <- 10L;
 maxDataSize <- 1000L;
 steps       <- 4L;
-model       <- regressoR.functional.models::FunctionalModel.quadratic();
+model       <- regressoR.functional.models::FunctionalModel.gompertz.1();
 
 cat("### Compare the Performance of the Different Function Fitters ###\n");
 
-
-methods.names <- c("nlslm", "minqa", "cmaes", "de", "dfoptim", "nls");
+methods.names <- c("nlslm", "minqa", "cmaes", "de", "dfoptim", "nls", "lbfgsb");
 cat("      methods: ", paste(methods.names, collapse=", "), "\n", sep="");
 cat("min data size: ", minDataSize, "\n", sep="");
 cat("max data size: ", maxDataSize, "\n", sep="");
@@ -25,7 +24,6 @@ cat("        steps: ", steps, "\n", sep="");
 cat("        model: ", toString(deparse(body(model@f))), " with ", model@paramCount, " parameters\n", sep="");
 
 # make the set of methods
-methods.names <- c("nlslm", "minqa", "cmaes", "de", "dfoptim", "nls");
 methods.calls <- lapply(X=methods.names,
                         FUN=function(t) {
                           result <- get(paste(c("FunctionalModel.fit.", t), collapse=""));
@@ -41,11 +39,36 @@ canSolve <- function(metric) all(unlist(lapply(X=1:2, FUN=function(i)
 
 # create a solveable problem of the given size
 makeProblem <- function(dataSize) {
-  while(TRUE) {
-    problem.x      <- runif(n=dataSize,         min=-10, max=10);
-    problem.par    <- runif(n=model@paramCount, min=-10, max=10);
-    problem.f      <- function(x) model@f(x, problem.par);
-    problem.y      <- problem.f(problem.x);
+  repeat {
+
+    repeat {
+      repeat {
+        problem.par <- runif(n=model@paramCount, min=-3, max=3);
+        if(regressoR.functional.models::FunctionalModel.par.check(model, problem.par)) {
+          break;
+        }
+      }
+
+      repeat {
+        problem.x      <- runif(n=dataSize, min=-10, max=10);
+        if(length(unique(problem.x)) >= dataSize) {
+          break;
+        }
+      }
+
+      problem.f      <- function(x) model@f(x, problem.par);
+      problem.y      <- problem.f(problem.x);
+
+      if(length(unique(problem.y)) >= length(problem.y)) {
+        range <- range(problem.y);
+        if(range[2] > range[1]) {
+          if( ((range[2] - range[1]) / max(abs(range))) > 0.1) {
+            break;
+          }
+        }
+      }
+    }
+
     noisy.x        <- rnorm(n=length(problem.x), mean=problem.x, sd=0.1);
     noisy.x        <- force(noisy.x);
     noisy.y        <- rnorm(n=length(problem.y), mean=problem.y, sd=0.1);

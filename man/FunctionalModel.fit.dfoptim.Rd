@@ -19,6 +19,6 @@ On success, an instance of \code{\link{FittedFunctionalModel}}.
   \code{NULL} on failure.
 }
 \description{
-Apply twi derivative-free algorithms, namely Hook-Jeeves and
+Apply two derivative-free algorithms, namely Hook-Jeeves and
   Nelder-Mead, to fit a functional model.
 }

@@ -4,7 +4,7 @@
 
 #' @title Use Derivative-Free Local Searches to Optimize the Parameters
 #'
-#' @description Apply twi derivative-free algorithms, namely Hook-Jeeves and
+#' @description Apply two derivative-free algorithms, namely Hook-Jeeves and
 #'   Nelder-Mead, to fit a functional model.
 #'
 #' @param metric an instance of

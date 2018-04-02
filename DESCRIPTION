@@ -25,7 +25,7 @@ Imports: cmaes (>= 1.0.11),
          methods (>= 3.3.2),
          regressoR.base (>= 0.8.3),
          regressoR.functional.models (>= 0.8.8),
-         regressoR.quality (>= 0.8.3),
+         regressoR.quality (>= 0.8.4),
          stats (>= 3.3.2)
 Suggests: testthat (>= 2.0.0),
           roxygen2 (>= 6.0.1)
@@ -50,4 +50,5 @@ Collate:
     'fit.R'
     'fitTransformed.R'
     'makeLearners.R'
+    'optim.R'
 RoxygenNote: 6.0.1.9000
