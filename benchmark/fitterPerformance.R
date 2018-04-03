@@ -21,19 +21,26 @@ library(MASS);
 set.seed(2500234L);
 minDataSize  <- 10L;
 maxDataSize  <- 1000L;
+numProblems  <- 66L;
+numRuns      <- 33L;
+numTests     <- as.integer(((3*numRuns) / 2) ^ 1.1);
+
 model        <- regressoR.functional.models::FunctionalModel.logistic.1();
-model.lower  <- rep(0.01, 4L);
-model.upper  <- rep(3, 4L);
+model.lower  <- rep(0.01, model@paramCount);
+model.upper  <- rep(3, model@paramCount);
 x.min        <- 0.01;
 x.max        <- 5;
 
 cat("### Compare the Performance of the Different Function Fitters ###\n");
 
 methods.names <- c("nlslm", "minqa", "cmaes", "de", "dfoptim", "nls", "lbfgsb");
-cat("      methods: ", paste(methods.names, collapse=", "), "\n", sep="");
-cat("min data size: ", minDataSize, "\n", sep="");
-cat("max data size: ", maxDataSize, "\n", sep="");
-cat("        model: ", toString(deparse(body(model@f))), " with ", model@paramCount, " parameters\n", sep="");
+cat("       ", length(methods.names), "  methods: ", paste(methods.names, collapse=", "), "\n", sep="");
+cat(" mininum data size: ", minDataSize, "\n", sep="");
+cat(" maximum data size: ", maxDataSize, "\n", sep="");
+cat("             model: ", model@name, " - ", toString(deparse(body(model@f))), " with ", model@paramCount, " parameters\n", sep="");
+cat("number of problems: ", numProblems, "\n", sep="");
+cat("  runs per problem: ", numRuns, "\n", sep="");
+cat(" tests per problem: ", numTests, "\n", sep="");
 
 # make the set of methods
 methods.calls <- lapply(X=methods.names,
@@ -43,14 +50,15 @@ methods.calls <- lapply(X=methods.names,
                           return(result);
                         });
 
-# check whether there is any method that cannot solve a given problem (four times)
+# check whether there is any method that cannot solve a given problem (numTests times)
 # and that the problem is neither too easy nor too hard.
-canSolve <- function(metric) {
-  for(i in 1:4) {
-    for(method in methods.calls) {
-      result <- method(metric, model);
+canSolve <- function(problem) {
+  for(method in methods.calls) {
+    for(i in 1:numTests) {
+      result <- method(metric=problem$metric, model=model, par=problem$par);
       if(is.null(result) ||
-        ((!(is.finite(result@quality))) || (result@quality <= 0.1) || (result@quality >= 100))) {
+        ((!(is.finite(result@quality))) ||
+         (result@quality <= 0.1) || (result@quality >= 2))) {
         return(FALSE);
       }
     }
@@ -62,7 +70,6 @@ canSolve <- function(metric) {
 makeProblem <- function(dataSize) {
   cat("new problem of size ", dataSize, sep="", collapse="");
   repeat {
-
     repeat {
       repeat {
         problem.par <- runif(n=model@paramCount, min=model.lower, max=model.upper);
@@ -95,7 +102,7 @@ makeProblem <- function(dataSize) {
       }
     }
 
-    for(i in 1:20) {
+    for(i in 1:50) {
       repeat {
         x.sd <- 2^runif(n=1, min=-6, max=0.5);
         noisy.x <- rnorm(n=length(problem.x), mean=problem.x, sd=x.sd);
@@ -116,16 +123,24 @@ makeProblem <- function(dataSize) {
         }
       }
       noisy.y        <- force(noisy.y);
-      problem.metric <- regressoR.quality::RegressionQualityMetric.default(noisy.x, noisy.y);
-      problem.metric <- force(problem.metric);
+      problem        <- NULL;
+      problem$metric <- regressoR.quality::RegressionQualityMetric.default(noisy.x, noisy.y);
+      problem$metric <- force(problem$metric);
+      problem$par    <- regressoR.functional.models::FunctionalModel.par.estimate(model,
+                                                                                  x=problem$metric@x,
+                                                                                  y=problem$metric@y);
+      problem$par    <- force(problem$par);
+      problem        <- force(problem);
 
-      if(canSolve(problem.metric)) {
+      if(canSolve(problem)) {
         col <- rgb(runif(1),runif(1),runif(1));
         #points(noisy.x, noisy.y, col=col, lwd=0.2);
         curve(problem.f, 0.1*x.min, x.max, col=col, add=TRUE, lwd=2);
 
-        cat(": par=", paste(problem.par, sep="", collapse=", "), ", x.sd=", x.sd, ", y.sd=", y.sd, "\n", sep="", collapse="");
-        return(problem.metric);
+        cat(": par=c(", paste(problem.par, sep="", collapse=", "),
+            "), x.sd=", x.sd, ", y.sd=", y.sd,
+            ", est=c(", paste(problem$par, sep="", collapse=", "), ")\n", sep="", collapse="");
+        return(problem);
       }
     }
   }
@@ -133,7 +148,7 @@ makeProblem <- function(dataSize) {
 
 # create 'number' problems whose size is between 'minDataSize' and 'maxDataSize', both bounds are inclusive
 makeProblems <- function(number) {
-  plot(c(0, x.max), c(0, 6), type="n");
+  plot(c(0, x.max), c(0, 6), type="n", xlab="", ylab="");
   return(lapply(X=as.integer(minDataSize+((maxDataSize-minDataSize)*(0:(number-1))/(number-1))),
                 FUN=makeProblem));
 }
@@ -145,6 +160,7 @@ results <- new.env();
 clearResults <- function() {
   for(method in methods.names) {
     assign(x=method, value=NULL, pos=results);
+    assign(x=paste0(method,"F"), value=0L, pos=results);
   }
 }
 
@@ -153,14 +169,20 @@ clearResults <- function() {
 applyMethod <- function(method.index, problems) {
   output <- vapply(X=problems,
                   FUN=function(problem) {
-                    result <- methods.calls[[method.index]](problem, model);
+                    result <- methods.calls[[method.index]](metric=problem$metric,
+                                                            model=model, par=problem$par);
                     if(is.null(result)) { return(+Inf); }
                     return(result@quality);
                   },
                   FUN.VALUE = +Inf);
-  assign(x=methods.names[[method.index]],
-         value=c(get(x=methods.names[[method.index]], pos=results), output),
-         pos=results);
+  if(all(is.finite(output))) {
+    assign(x=methods.names[[method.index]],
+           value=c(get(x=methods.names[[method.index]], pos=results), output),
+           pos=results);
+  } else {
+    name <- paste0(methods.names[[method.index]], "F");
+    assign(x=name, value=(as.integer(sum(!(is.finite(output)))) + get(x=name, pos=results)), pos=results);
+  }
 }
 
 # make the benchmark calls
@@ -183,7 +205,7 @@ runBechmarks <- function(problems) {
   clearResults();
   calls        <- makeBenchmarkCalls(problems);
   names(calls) <- methods.names;
-  micro        <- microbenchmark::microbenchmark(list = calls, times=2L+as.integer(round(4000L/length(problems))));
+  micro        <- microbenchmark::microbenchmark(list = calls, times=numRuns);
 
   times        <- lapply(X=methods.names,
                          FUN=function(name) {
@@ -200,8 +222,8 @@ runBechmarks <- function(problems) {
                          });
   times     <- force(times);
   qualities <- force(qualities);
-  retval    <-list(times=times, qualities=qualities);
-  retval    <-force(retval);
+  retval    <- list(times=times, qualities=qualities);
+  retval    <- force(retval);
   clearResults();
   return(retval);
 }
@@ -244,12 +266,15 @@ evaluateResults <- function(times, qualities) {
     }
   }
 
+  failures <- vapply(X=methods.names, FUN=function(n) get(x=paste0(n, "F"), pos=results), FUN.VALUE=-1L);
+
   printer <- t(matrix(c(
     "        methods:", unlist(methods.names),
     "        quality mean:", means.quality,
     "        quality rank:", ranks.quality,
     "        time mean:", means.time,
-    "        time rank:", ranks.time), ncol=5));
+    "        time rank:", ranks.time,
+    "        failures:", failures), ncol=6));
   write.matrix(printer);
 
   cat("by quality-mean: ", paste(methods.names[order(means.quality)], collapse=", "), "\n", sep="");
@@ -263,9 +288,9 @@ cat("\n\n######################################################################\
     "# Tackling Problems of Range ", minDataSize, "...", maxDataSize, "\n",
     "######################################################################\n",
     sep="");
-problems = makeProblems(100);
+problems = makeProblems(numProblems);
 cat(length(problems), " problems have been created with mean size ",
-    mean(vapply(X=problems, FUN=function(x) length(x@x), FUN.VALUE = NaN)),
+    mean(vapply(X=problems, FUN=function(x) length(x$metric@x), FUN.VALUE = NaN)),
      "\n...now beginning to benchmark.\n",
     sep="");
 
