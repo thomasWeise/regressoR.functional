@@ -1,145 +1,134 @@
 #' @include FittedFunctionalModel.R
-#' @include defaultFitters.R
+#' @include cmaes.R
+#' @include minqa.R
+#' @include nlslm.R
+#' @include de.R
+#' @include dfoptim.R
+#' @include nls.R
+#' @include optim.R
 #' @include tools.R
 #' @include utils.R
 
+# the fitters to be used in a normal situation
+.fitters <- c(
+  FunctionalModel.fit.nlslm,
+  FunctionalModel.fit.minqa,
+  FunctionalModel.fit.lbfgsb,
+  FunctionalModel.fit.nls
+)
+
+# the indexes of the fitters to use when we have a starting point
+.fitters.for.starting.point     <- 1L:length(.fitters);
+# the indexes of the fitters to use if we do not have a starting point: apply
+# some fitters multiple times for more diversity (as each application gets a
+# different, unique starting point)
+.fitters.without.starting.point <- c(1L, 1L, 1L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L);
+
+# the list of fitters to use if could not produce any feasible parameterization
+.fitters.fallback <- unlist(c(
+  FunctionalModel.fit.de,
+  FunctionalModel.fit.dfoptim,
+  .fitters,
+  FunctionalModel.fit.cmaes
+))
+
 #' @title Fit the Given Model Blueprint to the Specified Data
 #'
-#' @description Apply a set of fitters iteratively to fit the specified model to
-#' the given data. First, we generate a starting guess about the
-#' parameterization via \code{\link{FunctionalModel.par.estimate}} (or accept it
-#' via the parameter \code{par}). From then on, we apply the different
-#' function fitters one by one. All the fitters who have not produced the
-#' current best solution are applied again, to the now-best guess. However, we
-#' do not apply the fitters that have produced that very guess in the next
-#' round. (They may get a chance again in a later turn.) Anyway, this
-#' procedure is iterated until no improvement can be made anymore. After
-#' finishing the fitting, we attempt whether rounding the fitted parameters to
-#' integers can improve the fitting quality.
+#' @description This is the general method to be used to fit a \code{\link{FunctionalModel}} to
+#' a \code{\link{RegressionQualityMetric}}.
 #'
 #' @param metric an instance of \code{RegressionQualityMetric}
 #' @param model an instance of \code{\link{FunctionalModel}}
 #' @param par the initial starting point
-#' @param fitters the fitters
 #' @return On success, an instance of
 #'   \code{\link{FittedFunctionalModel}}. \code{NULL} on failure.
 #' @export FunctionalModel.fit
 #' @importFrom learnerSelectoR learning.checkQuality
 #' @importFrom regressoR.functional.models FunctionalModel.par.check FunctionalModel.par.estimate
-#' @examples
-#'
-#' set.seed(12555)
-#' x <- (1:201 - 100) * 0.1;
-#' fxpar <- function(x, par) par[1] + x * (par[2] + x * (par[3]));
-#' par <- c(4, -3, 2);
-#' fx <- function(x) fxpar(x, par);
-#' y <- fx(x);
-#' model <- regressoR.functional.models::FunctionalModel.quadratic();
-#' metric1 <- regressoR.quality::RegressionQualityMetric.default(x, y);
-#' res1 <- FunctionalModel.fit(metric1, model);
-#' res1@quality
-#' # [1] 0
-#' res1@par
-#' # [1]  4 -3  2
-#'
-#' xr <- x + 0.1*rnorm(length(x));
-#' yr <- y + 0.1*rnorm(length(y));
-#' metric2 <- regressoR.quality::RegressionQualityMetric.default(xr, yr);
-#' res2 <- FunctionalModel.fit(metric2, model);
-#' res2@quality
-#' # [1] 0.2439082
-#' res2@par
-#' # [1]  3.919365 -2.938202  1.998102
-FunctionalModel.fit <- function(metric, model, par=NULL,
-                                fitters = FunctionalModel.fit.defaultFitters(length(metric@x), model@paramCount)) {
+FunctionalModel.fit <- function(metric, model, par=NULL) {
   #  is the input data valid?
-  if(is.null(metric) || is.null(model) || is.null(fitters)) { return(NULL); }
+  if(is.null(metric) || is.null(model)) { return(NULL); }
 
-  # do we even have any fitter?
-  fitterCount <- length(fitters);
-  if(fitterCount <= 0L) { return(NULL); }
-
-  # initialize best holders
-  bestQuality <- +Inf;
-  bestParams  <- NULL;
-  bestResult  <- NULL;
-
-  # let's check if there is a valid starting point
-  if(FunctionalModel.par.check(model, par)) {
-    # ok, there is one, but is it valid?
-    q <- metric@quality(model@f, par);
-    if(learning.checkQuality(bestQuality)) {
-      # yets it is
-      bestQuality <- q;
-      bestParams  <- par;
-    }
+  if(is.null(par)) {
+    # We have no starting point, so we want to try some of the fitters several
+    # times to get a more robust answer
+    fitters <- .fitters.without.starting.point;
+  } else {
+    # We have a starting point, so apply each of the default fitters only once.
+    fitters <- .fitters.for.starting.point;
   }
 
-  # if we do not have a valid start point, give each algorithm 3 trials
-  if(is.null(bestParams)) {
-    times <- 3L;
-  } else { # if we have a start point, only 1 trial
-    times <- 1L;
-  }
+  # Create an initial population of several candidate vectors which each are
+  # slightly different from each other. This brings some diversity and makes
+  # sure that each fitter starts at a slightly different point. Thus, we can
+  # maybe avoid landing in a bad local optimum.
+  candidates <- .make.initial.pop(par, metric@x, metric@y, length(fitters), model);
+  best <- NULL;
+  # Apply all the fitters and record their fitting qualities.
+  qualities  <- vapply(X=fitters,
+                       FUN=function(i, env) {
+                         # Apply the selected fitter to the selected candidate point.
+                         result <- .fitters[[i]](metric=metric, model=model, par=candidates[i,]);
+                         # If it failed, return infinity.
+                         if(is.null(result)) { return(+Inf); }
+                         best <- get(x="best", pos=env);
+                         if(is.null(best) || (result@quality < best@quality)) {
+                           # Oh, the best solution has been beaten (or the first valid fitting has
+                           # been found). Update the best record.
+                           assign(x="best", value=result, pos=env);
+                         }
+                         return(result@quality);
+                       }, FUN.VALUE=+Inf, env=environment());
 
-  improved        <- TRUE;
-  fitterQualities <- rep(+Inf, fitterCount);
-
-  # if par==NULL, this cycle will loop at least two times
-  while(improved) {
-    improved <- FALSE;
-
-    # apply all fitters
-    for(i in 1L:fitterCount) {
-      # apply a fitter iff it did not YET see the best solution so far
-      if((!(is.finite(bestQuality))) || (fitterQualities[i] > bestQuality)) {
-        # we apply it then either once or three times
-        for(j in 1L:times) {
-          # call the fitter
-          res <- fitters[[i]](metric=metric, model=model, par=bestParams);
-          # check the result
-          if(!(is.null(res))) {
-            if(res@quality < fitterQualities[i]) {
-              # the new best solution seen by the fitter
-              fitterQualities[i] <- res@quality;
-            }
-            # but is this maybe even the best result so far?
-            if(is.null(bestResult) || (res@quality < bestResult@quality)) {
-              bestResult <- res;
-              improved   <- TRUE; # yes, we made an improvement!
-            }
-          }
-        }
+  if(is.null(best)) {
+    print("xxx")
+    # OK, if we get here, all the standard fitters have failed. We now try other
+    # methods to compensate, but these methods may be slow
+    for(fitter in .fitters.fallback) {
+      best <- fitter(metric=metric, model=model);
+      if(!(is.null(best))) {
+        # if we find a solution, we can immediately stop and try to refine it
+        break;
       }
     }
+  }
 
-    # if we get here but did not see any valid result, we can as well give up
-    if(is.null(bestResult)) { break; }
+  if(is.null(best)) {
+    # OK, so all fitters failed?
+    if(!is.null(par)) {
+      # But we have an initial point? Then there are two options: Either par is
+      # invalid too, or it is a very solidary optimum surrounded by infeasible
+      # solutions.
+      if(FunctionalModel.par.check(model, par)) {
+        # OK, par is within the specified bounds.
+        quality <- metric@quality(model@f, par);
+        if(learning.checkQuality(quality)) {
+          # And also has a valid quality - return it.
+          return(FittedFunctionalModel.new(model, par, quality));
+        } # the quality of par is invalid
+      } # par is outside the bounds
+    } # par is null
+    # If we get here, no dice, everything failed
+    return(NULL);
+  }
 
-    # if the best result's quality is not better than what we had last time, we
-    # can also stop
-    if(bestResult@quality >= bestQuality) {
-      bestResult <- NULL;
-      break;
+  # If we get here, at least some of our fitters have discovered a reasonable
+  # solution. But maybe it was discovered by a bad fitter, say nls, due to
+  # having a good initial point. Hence, we now make sure that all of the fitters
+  # that did not yet see the result get a chance to refine it.
+  fitters <- .fitters[unique(fitters[qualities > best@quality])];
+  if(length(fitters) > 0L) {
+    # iterate over all the standard fitters
+    for(fitter in fitters) {
+      # apply the standard fitter
+      result <- fitter(metric=metric, model=model, par=best@par);
+      if((!(is.null(result))) && (result@quality < best@quality)) {
+        # record any improvement
+        best <- result;
+      }
     }
-
-    # ok, we have an improvement, use the current best as starting point for the
-    # next iteration
-    bestQuality <- bestResult@quality;
-    bestParams  <- bestResult@par;
-    times       <- 1L;
   }
 
-  # there was no improvement or even no valid result
-  if(is.null(bestResult) &&
-     FunctionalModel.par.check(model, bestParams) &&
-     learning.checkQuality(bestQuality)) {
-    # strange, ok, let's try to build a new solution
-    # this could happen if we have a valid starting point which is somehow
-    # surrounded by only invalid solutions
-    return(FittedFunctionalModel.new(model, bestParams, bestQuality));
-  }
-
-  # best result is either something good or NULL
-  return(bestResult);
+  # return the best result
+  return(best);
 }

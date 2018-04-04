@@ -1,18 +1,17 @@
 #' @include TransformedFittedFunctionalModel.R
-#' @include defaultFitters.R
 #' @include fit.R
 
 #' @title Fit the Given Model Blueprint to the Specified Data
 #'
-#' @description Apply a set of fitters iteratively to fit the specified model to
-#' the given data. First, we generate a starting guess about the
-#' parameterization via \code{\link{FunctionalModel.par.estimate}} (or accept it
-#' via the parameter \code{par}). From then on, we apply the different function
-#' fitters one by one. All the fitters who have not produced the current best
-#' solution are applied again, to the now-best guess. However, we do not apply
-#' the fitters that have produced that very guess in the next round. (They may
-#' get a chance again in a later turn.) Anyway, this procedure is iterated until
-#' no improvement can be made anymore. After finishing the fitting, we attempt
+#' @description Fit the specified model to the given data. First, we generate a
+#' starting guess about the parameterization via
+#' \code{\link{FunctionalModel.par.estimate}} (or accept it via the parameter
+#' \code{par}). From then on, we apply the different function fitters one by
+#' one. All the fitters who have not produced the current best solution are
+#' applied again, to the now-best guess. However, we do not apply the fitters
+#' that have produced that very guess in the next round. (They may get a chance
+#' again in a later turn.) Anyway, this procedure is iterated until no
+#' improvement can be made anymore. After finishing the fitting, we attempt
 #' whether rounding the fitted parameters to integers can improve the fitting
 #' quality.
 #'
@@ -20,12 +19,12 @@
 #'   \code{RegressionQualityMetric}
 #' @param model an instance of \code{\link{FunctionalModel}}
 #' @param par the initial starting point
-#' @param fitters the fitters
 #' @param transformation.x the transformation along the \code{x}-axis, or
 #'   \code{NULL} if none was applied to the data
 #' @param transformation.y the transformation along the \code{y}-axis, or
 #'   \code{NULL} if none was applied to the data
 #' @param metric.transformed the transformed metric for the first fitting step
+#' @param fitter the model fitter to use
 #' @return On success, an instance of \code{\link{FittedFunctionalModel}}.
 #'   \code{NULL} on failure.
 #' @export FunctionalModel.fit.transformed
@@ -63,7 +62,11 @@ FunctionalModel.fit.transformed <- function(metric, model,
                                             transformation.x=NULL, transformation.y=NULL,
                                             metric.transformed=NULL,
                                             par=NULL,
-                                            fitters = FunctionalModel.fit.defaultFitters(length(metric@x), model@paramCount)) {
+                                            fitter=FunctionalModel.fit) {
+
+  if(is.null(fitter) || (!(is.function(fitter)))) {
+    stop("Fitter chooser must be a proper function.");
+  }
 
   # First we check the transformations whether they are NULL or identity
   # transformations.
@@ -86,7 +89,7 @@ FunctionalModel.fit.transformed <- function(metric, model,
       # OK, we fit on the original, raw data. The transformations are identity
       # or NULL and the transformed metric is NULL or identical to the actual
       # metric.
-      return(FunctionalModel.fit(metric=metric, model=model,par=par, fitters=fitters));
+      return(fitter(metric=metric, model=model,par=par));
     } else {
       stop("Transformed metric must be identical to actual metric or NULL if transformations are both NULL or identity.");
     }
@@ -97,8 +100,7 @@ FunctionalModel.fit.transformed <- function(metric, model,
   }
 
   # The first fitting step takes place on the raw data.
-  result <- FunctionalModel.fit(metric=metric.transformed, model=model,
-                                par=par, fitters=fitters);
+  result <- fitter(metric=metric.transformed, model=model, par=par);
   if(is.null(result)) {
     return(NULL);
   }
@@ -133,7 +135,7 @@ FunctionalModel.fit.transformed <- function(metric, model,
                                            paramUpper = model@paramUpper,
                                            name=model@name);
   # fit the model, starting with the current parameterization
-  result.2 <- FunctionalModel.fit(metric, model.temp, par=result@par, fitters = fitters);
+  result.2 <- fitter(metric, model.temp, par=result@par);
   if(is.null(result.2)) {
     # if we failed, let's see whether we can just use the original result
     result@quality <- metric@quality(f.n, result@par);

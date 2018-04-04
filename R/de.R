@@ -35,7 +35,7 @@ FunctionalModel.fit.de <- function(metric, model, par=NULL) {
   NP <- (5L + model@paramCount); # required by DE library
 
   .ignore.errors({
-    initialPop <- .make.initial.pop(par, metric@x, metric@y, lower, upper, NP, model);
+    initialPop <- .make.initial.pop(par, metric@x, metric@y, NP, model);
 
     if(is.null(lower)) {
       lower <- rep(-1e10 - max(abs(initialPop)), model@paramCount);

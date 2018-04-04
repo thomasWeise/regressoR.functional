@@ -114,10 +114,10 @@ test_that("Test .make.initial.pop works correctly", {
       while(runif(1) > 0.5) { upper[as.integer(runif(n)) + 1] <- NA; }
     }
 
+    model@paramLower <- lower;
+    model@paramUpper <- upper;
     pop = .make.initial.pop( runif(n=n, min=-200, max=200),
                              runif(n=n, min=-200, max=200),
-                             lower=lower,
-                             upper=upper,
                              NP=NP,
                              model=model)
 

@@ -6,8 +6,7 @@
 \usage{
 FunctionalModel.fit.transformed(metric, model, transformation.x = NULL,
   transformation.y = NULL, metric.transformed = NULL, par = NULL,
-  fitters = FunctionalModel.fit.defaultFitters(length(metric@x),
-  model@paramCount))
+  fitter = FunctionalModel.fit)
 }
 \arguments{
 \item{metric}{an instance of
@@ -25,22 +24,22 @@ FunctionalModel.fit.transformed(metric, model, transformation.x = NULL,
 
 \item{par}{the initial starting point}
 
-\item{fitters}{the fitters}
+\item{fitter}{the model fitter to use}
 }
 \value{
 On success, an instance of \code{\link{FittedFunctionalModel}}.
   \code{NULL} on failure.
 }
 \description{
-Apply a set of fitters iteratively to fit the specified model to
-the given data. First, we generate a starting guess about the
-parameterization via \code{\link{FunctionalModel.par.estimate}} (or accept it
-via the parameter \code{par}). From then on, we apply the different function
-fitters one by one. All the fitters who have not produced the current best
-solution are applied again, to the now-best guess. However, we do not apply
-the fitters that have produced that very guess in the next round. (They may
-get a chance again in a later turn.) Anyway, this procedure is iterated until
-no improvement can be made anymore. After finishing the fitting, we attempt
+Fit the specified model to the given data. First, we generate a
+starting guess about the parameterization via
+\code{\link{FunctionalModel.par.estimate}} (or accept it via the parameter
+\code{par}). From then on, we apply the different function fitters one by
+one. All the fitters who have not produced the current best solution are
+applied again, to the now-best guess. However, we do not apply the fitters
+that have produced that very guess in the next round. (They may get a chance
+again in a later turn.) Anyway, this procedure is iterated until no
+improvement can be made anymore. After finishing the fitting, we attempt
 whether rounding the fitted parameters to integers can improve the fitting
 quality.
 }

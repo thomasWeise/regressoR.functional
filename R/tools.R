@@ -38,7 +38,7 @@
 # Make an initial population of size \code{NP}
 #' @importFrom stats rnorm runif
 #' @importFrom regressoR.functional.models FunctionalModel.par.fix
-.make.initial.pop <- function(par, x, y, lower, upper, NP, model) {
+.make.initial.pop <- function(par, x, y, NP, model) {
 
   # if no starting vector is provided, we use the parameter guessers
   if(is.null(par)) {
@@ -68,10 +68,10 @@
   }
 
   # Do we need to check the boundaries?
-  if(!(is.null(lower) && is.null(upper))) {
+  if(!(is.null(model@paramLower) && is.null(model@paramUpper))) {
     # Yes we do
     for(i in 1:NP) {
-      pop[i,] <- FunctionalModel.par.fix(pop[i, ], lower, upper, model@paramCount);
+      pop[i,] <- FunctionalModel.par.fix(pop[i, ], model@paramLower, model@paramUpper, model@paramCount);
     }
   }
 

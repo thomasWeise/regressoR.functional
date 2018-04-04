@@ -5,15 +5,13 @@
 \title{Create Learners for the Given Set of Models}
 \usage{
 FunctionalModel.makeLearners(models = FunctionalModel.all(),
-  fitters = .defFit)
+  fitter = FunctionalModel.fit)
 }
 \arguments{
 \item{models}{the set of models to use, by default this is
 \code{\link{FunctionalModel.all}}}
 
-\item{fitters}{the algorithm selecting which fitters to apply for each
-model and data set, by default this is
-\code{\link{FunctionalModel.fit.defaultFitters}}.}
+\item{fitter}{the model fitter to use}
 }
 \value{
 a list of fitters that can be applied.
