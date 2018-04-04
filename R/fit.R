@@ -77,11 +77,14 @@ FunctionalModel.fit <- function(metric, model, par=NULL) {
                            # been found). Update the best record.
                            assign(x="best", value=result, pos=env);
                          }
-                         return(result@quality);
+
+                         # We will not allow nls a second chance because it is
+                         # generally a bad method.
+                         if(i < 4){ return(result@quality); }
+                         return(+Inf);
                        }, FUN.VALUE=+Inf, env=environment());
 
   if(is.null(best)) {
-    print("xxx")
     # OK, if we get here, all the standard fitters have failed. We now try other
     # methods to compensate, but these methods may be slow
     for(fitter in .fitters.fallback) {
