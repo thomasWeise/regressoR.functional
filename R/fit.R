@@ -40,12 +40,15 @@
 #' @param metric an instance of \code{RegressionQualityMetric}
 #' @param model an instance of \code{\link{FunctionalModel}}
 #' @param par the initial starting point
+#' @param q the effort to spent in learning, a value between 0 (min) and 1
+#'   (max). Higher values may lead to much more computational time, lower values
+#'   to potentially lower result quality.
 #' @return On success, an instance of
 #'   \code{\link{FittedFunctionalModel}}. \code{NULL} on failure.
 #' @export FunctionalModel.fit
 #' @importFrom learnerSelectoR learning.checkQuality
 #' @importFrom regressoR.functional.models FunctionalModel.par.check FunctionalModel.par.estimate
-FunctionalModel.fit <- function(metric, model, par=NULL) {
+FunctionalModel.fit <- function(metric, model, par=NULL, q=0.75) {
   #  is the input data valid?
   if(is.null(metric) || is.null(model)) { return(NULL); }
 
@@ -119,15 +122,17 @@ FunctionalModel.fit <- function(metric, model, par=NULL) {
   # solution. But maybe it was discovered by a bad fitter, say nls, due to
   # having a good initial point. Hence, we now make sure that all of the fitters
   # that did not yet see the result get a chance to refine it.
-  fitters <- .fitters[unique(fitters[qualities > best@quality])];
-  if(length(fitters) > 0L) {
-    # iterate over all the standard fitters
-    for(fitter in fitters) {
-      # apply the standard fitter
-      result <- fitter(metric=metric, model=model, par=best@par);
-      if((!(is.null(result))) && (result@quality < best@quality)) {
-        # record any improvement
-        best <- result;
+  if(q > 0.55) {
+    fitters <- .fitters[unique(fitters[qualities > best@quality])];
+    if(length(fitters) > 0L) {
+      # iterate over all the standard fitters
+      for(fitter in fitters) {
+        # apply the standard fitter
+        result <- fitter(metric=metric, model=model, par=best@par);
+        if((!(is.null(result))) && (result@quality < best@quality)) {
+          # record any improvement
+          best <- result;
+        }
       }
     }
   }

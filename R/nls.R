@@ -12,6 +12,9 @@
 #'   \code{regressoR.quality::RegressionQualityMetric}
 #' @param model an instance of \code{\link{FunctionalModel}}
 #' @param par the initial starting point
+#' @param q the effort to spent in learning, a value between 0 (min) and 1
+#'   (max). Higher values may lead to much more computational time, lower values
+#'   to potentially lower result quality.
 #' @return On success, an instance of \code{\link{FittedFunctionalModel}}.
 #'   \code{NULL} on failure.
 #' @seealso \code{\link{nls}}
@@ -21,7 +24,7 @@
 #' @importFrom regressoR.functional.models FunctionalModel.par.estimate
 #'   FunctionalModel.par.check
 #' @export FunctionalModel.fit.nls
-FunctionalModel.fit.nls <- function(metric, model, par=NULL) {
+FunctionalModel.fit.nls <- function(metric, model, par=NULL, q=0.75) {
   if(is.null(metric) || is.null(model) ||
      is.null(metric@x) || is.null(metric@y)) { return(NULL); }
 

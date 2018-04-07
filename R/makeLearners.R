@@ -21,11 +21,11 @@ FunctionalModel.makeLearners <- function(models = FunctionalModel.all(),
 
   result <- lapply(X=models, FUN = function(model) {
     model <- force(model);
-    func <- function(metric, transformation.x, transformation.y, metric.transformed)
+    func <- function(metric, transformation.x, transformation.y, metric.transformed, q)
                  FunctionalModel.fit.transformed(
                     metric=metric, model=model, transformation.x=transformation.x,
                     transformation.y=transformation.y, metric.transformed=metric.transformed,
-                    par=NULL, fitter=fitter);
+                    par=NULL, q=q, fitter=fitter);
     func <- force(func);
     return(func);
     });

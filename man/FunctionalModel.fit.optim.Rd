@@ -4,7 +4,8 @@
 \alias{FunctionalModel.fit.optim}
 \title{Use the \code{\link{optim}} Method from the \code{stats} Package for Fitting a Model}
 \usage{
-FunctionalModel.fit.optim(metric, model, par = NULL, method = "L-BFGS-B")
+FunctionalModel.fit.optim(metric, model, par = NULL, q = 0.75,
+  method = "L-BFGS-B")
 }
 \arguments{
 \item{metric}{an instance of
@@ -13,6 +14,10 @@ FunctionalModel.fit.optim(metric, model, par = NULL, method = "L-BFGS-B")
 \item{model}{an instance of \code{\link{FunctionalModel}}}
 
 \item{par}{the initial starting point}
+
+\item{q}{the effort to spent in learning, a value between 0 (min) and 1
+(max). Higher values may lead to much more computational time, lower values
+to potentially lower result quality.}
 
 \item{method}{the method to apply, see the documentation of
 \code{\link{optim}}}

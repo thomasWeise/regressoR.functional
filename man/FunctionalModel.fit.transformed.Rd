@@ -6,11 +6,10 @@
 \usage{
 FunctionalModel.fit.transformed(metric, model, transformation.x = NULL,
   transformation.y = NULL, metric.transformed = NULL, par = NULL,
-  fitter = FunctionalModel.fit)
+  q = 0.75, fitter = FunctionalModel.fit)
 }
 \arguments{
-\item{metric}{an instance of
-\code{RegressionQualityMetric}}
+\item{metric}{an instance of \code{RegressionQualityMetric}}
 
 \item{model}{an instance of \code{\link{FunctionalModel}}}
 
@@ -23,6 +22,10 @@ FunctionalModel.fit.transformed(metric, model, transformation.x = NULL,
 \item{metric.transformed}{the transformed metric for the first fitting step}
 
 \item{par}{the initial starting point}
+
+\item{q}{the effort to spent in learning, a value between 0 (min) and 1
+(max). Higher values may lead to much more computational time, lower values
+to potentially lower result quality.}
 
 \item{fitter}{the model fitter to use}
 }

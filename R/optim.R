@@ -13,6 +13,9 @@
 #'   \code{regressoR.quality::RegressionQualityMetric}
 #' @param model an instance of \code{\link{FunctionalModel}}
 #' @param par the initial starting point
+#' @param q the effort to spent in learning, a value between 0 (min) and 1
+#'   (max). Higher values may lead to much more computational time, lower values
+#'   to potentially lower result quality.
 #' @param method the method to apply, see the documentation of
 #'   \code{\link{optim}}
 #' @return On success, an instance of \code{\link{FittedFunctionalModel}}.
@@ -23,7 +26,7 @@
 #' @importFrom regressoR.functional.models FunctionalModel.par.estimate
 #'   FunctionalModel.par.check
 #' @export FunctionalModel.fit.optim
-FunctionalModel.fit.optim <- function(metric, model, par=NULL, method="L-BFGS-B") {
+FunctionalModel.fit.optim <- function(metric, model, par=NULL, q=0.75, method="L-BFGS-B") {
   if(is.null(metric) || is.null(model) ) { return(NULL); }
 
   if(is.null(par)) {
@@ -82,8 +85,11 @@ FunctionalModel.fit.optim <- function(metric, model, par=NULL, method="L-BFGS-B"
 #'   \code{regressoR.quality::RegressionQualityMetric}
 #' @param model an instance of \code{\link{FunctionalModel}}
 #' @param par the initial starting point
+#' @param q the effort to spent in learning, a value between 0 (min) and 1
+#'   (max). Higher values may lead to much more computational time, lower values
+#'   to potentially lower result quality.
 #' @return On success, an instance of \code{\link{FittedFunctionalModel}}.
 #'   \code{NULL} on failure.
 #' @export FunctionalModel.fit.lbfgsb
-FunctionalModel.fit.lbfgsb <- function(metric, model, par=NULL)
-     FunctionalModel.fit.optim(metric=metric, model=model, par=par, method="L-BFGS-B")
+FunctionalModel.fit.lbfgsb <- function(metric, model, par=NULL, q=0.75)
+     FunctionalModel.fit.optim(metric=metric, model=model, par=par, q=q, method="L-BFGS-B")

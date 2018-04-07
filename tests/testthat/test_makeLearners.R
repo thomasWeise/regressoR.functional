@@ -20,7 +20,7 @@ test_that("Test FunctionalModel.makeLearners", {
   for(learner in learners) {
     expect_true(is.function(learner));
     if(full.tests) {
-      result <- learner(metric, NULL, NULL, NULL);
+      result <- learner(metric, NULL, NULL, NULL, 0.75);
       expect_true(!is.null(result));
       expect_is(result, "FittedFunctionalModel");
       validObject(result);

@@ -5,7 +5,7 @@
 \title{Use the L-BFGS-B Algorithm from the \code{\link{optim}} Method of the
   \code{stats} Package for Fitting a Model}
 \usage{
-FunctionalModel.fit.lbfgsb(metric, model, par = NULL)
+FunctionalModel.fit.lbfgsb(metric, model, par = NULL, q = 0.75)
 }
 \arguments{
 \item{metric}{an instance of
@@ -14,6 +14,10 @@ FunctionalModel.fit.lbfgsb(metric, model, par = NULL)
 \item{model}{an instance of \code{\link{FunctionalModel}}}
 
 \item{par}{the initial starting point}
+
+\item{q}{the effort to spent in learning, a value between 0 (min) and 1
+(max). Higher values may lead to much more computational time, lower values
+to potentially lower result quality.}
 }
 \value{
 On success, an instance of \code{\link{FittedFunctionalModel}}.
