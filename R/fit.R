@@ -6,6 +6,7 @@
 #' @include dfoptim.R
 #' @include nls.R
 #' @include optim.R
+#' @include pso.R
 #' @include tools.R
 #' @include utils.R
 
@@ -17,7 +18,8 @@
   FunctionalModel.fit.nls,           #  4L
   FunctionalModel.fit.de,            #  5L
   FunctionalModel.fit.dfoptim,       #  6L
-  FunctionalModel.fit.cmaes          #  7L
+  FunctionalModel.fit.cmaes,         #  7L
+  FunctionalModel.fit.pso            #  8L
 )
 
 # the sequence in which the fitter set is populated
@@ -25,18 +27,8 @@
 .fitters.seq <- c( 1L,  2L,  3L,  4L,  1L,
                    2L,  3L,  3L,  1L,  4L,
                    4L,  1L,  2L,  3L,  2L,
-                   5L,  1L,  6L,  2L,  7L)
-
-.a <- 4
-.b <- -(9L * length(.fitters.seq) - 148L) / 3L
-.c <- (12L * length(.fitters.seq) - 160L) / 3L
-
-# get the list of fitters for the given situation
-.fitters.get <- function(q, hasStart) {
-  if(hasStart) q <- q * q;
-  .fitters.seq[1L:as.integer(max(4, ceiling(.a + .b*q + .c*q*q)))];
-}
-
+                   5L,  1L,  6L,  2L,  7L,
+                   3L,  8L)
 
 #' @title Fit the Given Model Blueprint to the Specified Data
 #'
@@ -59,13 +51,12 @@ FunctionalModel.fit <- function(metric, model, par=NULL, q=0.75) {
   if(is.null(metric) || is.null(model)) { return(NULL); }
 
   # get the fitters to use for this setup
-  if(is.null(par)) {
-    qt <- q;
-  } else {
-    # if a starting point is provided, tend to use fewer fitters
-    qt <- q*q;
-  }
-  fitters <- .fitters.seq[1L:as.integer(max(4, ceiling(.a + .b*qt + .c*qt*qt)))];
+  if(is.null(par)) { qt <- q;    } # if we have no starting point, use q
+  else             { qt <- q*q;  } # otherwise, use q^2, which must be less
+  if(qt < 0.75)    { qt <- (1L + (40*qt/3)); } # ramp the number of fitters from 1..11 for q in 0..0.75
+  else             { qt <- (11L + ((qt-0.75)/0.25)*(length(.fitters.seq) - 11L)); } # and then up to L
+
+  fitters <- .fitters.seq[1L:as.integer(max(1L, as.integer(0.5 + qt)))];
   # choose the fitters that can re-tried in a refinement step
   refine  <- max(3L, as.integer(3L + (((q - 0.75)/0.25)*(length(.fitters) - 2.5))));
 

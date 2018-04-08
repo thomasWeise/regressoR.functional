@@ -29,7 +29,7 @@ FunctionalModel.fit.dfoptim <- function(metric, model, par=NULL, q=0.75) {
     par <- FunctionalModel.par.estimate(model, metric@x, metric@y);
   }
 
-  limits <- .fix.boundaries(model);
+  limits <- .fix.boundaries(model, par=par);
   if(is.null(limits)) {
     lower <- NULL;
     upper <- NULL;
@@ -53,7 +53,7 @@ FunctionalModel.fit.dfoptim <- function(metric, model, par=NULL, q=0.75) {
         .ignore.errors({ result2 <- nmkb(par=par, fn=fn, upper=upper, control=control) });
       }
     } else {
-      if(is.null(model@paramUpper)) {
+      if(is.null(upper)) {
         .ignore.errors({ result1 <- hjkb(par=par, fn=fn, lower=lower, control=control) });
         .ignore.errors({ result2 <- nmkb(par=par, fn=fn, lower=lower, control=control) });
       } else {

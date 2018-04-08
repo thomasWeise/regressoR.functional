@@ -38,7 +38,7 @@ FunctionalModel.fit.nlslm <- function(metric, model, par=NULL, q=0.75) {
     jac <- NULL;
   }
 
-  limits <- .fix.boundaries(model);
+  limits <- .fix.boundaries(model, par=par);
   if(is.null(limits)) {
     lower <- NULL;
     upper <- NULL;

@@ -33,7 +33,7 @@ FunctionalModel.fit.optim <- function(metric, model, par=NULL, q=0.75, method="L
     par <- FunctionalModel.par.estimate(model, metric@x, metric@y);
   }
 
-  limits <- .fix.boundaries(model);
+  limits <- .fix.boundaries(model, par=par);
   if(is.null(limits)) {
     lower <- NULL;
     upper <- NULL;
@@ -55,7 +55,7 @@ FunctionalModel.fit.optim <- function(metric, model, par=NULL, q=0.75, method="L
         .ignore.errors({ result <- optim(par=par, fn=fn, upper=upper, method=method) });
       }
     } else {
-      if(is.null(model@paramUpper)) {
+      if(is.null(upper)) {
         .ignore.errors({ result <- optim(par=par, fn=fn, lower=lower, method=method) });
       } else {
         .ignore.errors({ result <- optim(par=par, fn=fn, lower=lower, upper=upper, method=method) });

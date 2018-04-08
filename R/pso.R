@@ -2,9 +2,11 @@
 #' @include utils.R
 #' @include tools.R
 
-#' @title Use CMA-ES to Optimize the Parameters
+#' @title Use the \code{\link{psoptim}} Method from the \code{pso} Package for
+#'   Fitting a Model
 #'
-#' @description Apply the CMA-ES algorithm to fit a functional model.
+#' @description Apply the Particle Swarm Optimization algorithm to fit the
+#'   parameters of a model.
 #'
 #' @param metric an instance of
 #'   \code{regressoR.quality::RegressionQualityMetric}
@@ -15,22 +17,20 @@
 #'   to potentially lower result quality.
 #' @return On success, an instance of \code{\link{FittedFunctionalModel}}.
 #'   \code{NULL} on failure.
-#' @importFrom cmaes cma_es
+#' @importFrom pso psoptim
 #' @importFrom learnerSelectoR learning.checkQuality
 #' @importClassesFrom regressoR.quality RegressionQualityMetric
 #' @importFrom regressoR.functional.models FunctionalModel.par.estimate
 #'   FunctionalModel.par.check
-#' @export FunctionalModel.fit.cmaes
-FunctionalModel.fit.cmaes <- function(metric, model, par=NULL, q=0.75) {
+#' @export FunctionalModel.fit.pso
+FunctionalModel.fit.pso <- function(metric, model, par=NULL, q=0.75) {
   if(is.null(metric) || is.null(model) ) { return(NULL); }
 
   if(is.null(par)) {
     par <- FunctionalModel.par.estimate(model, metric@x, metric@y);
   }
 
-  fn <- function(par) metric@quality(model@f, par);
-
-  limits <- .fix.boundaries(model, par=par);
+  limits <- .fix.boundaries(model, par=par, need=TRUE);
   if(is.null(limits)) {
     lower <- NULL;
     upper <- NULL;
@@ -39,25 +39,31 @@ FunctionalModel.fit.cmaes <- function(metric, model, par=NULL, q=0.75) {
     upper <- limits$upper;
   }
 
+  fn <- function(par) metric@quality(model@f, par);
+
+  # for some reason, I cannot get this to work with using a gradient
+
   .ignore.errors({
+    result <- NULL;
     if(is.null(lower)) {
       if(is.null(upper)) {
-        result <- cma_es(par=par, fn=fn);
+        .ignore.errors({ result <- psoptim(par=par, fn=fn) });
       } else {
-        result <- cma_es(par=par, fn=fn, upper=upper);
+        .ignore.errors({ result <- psoptim(par=par, fn=fn, upper=upper) });
       }
     } else {
       if(is.null(upper)) {
-        result <- cma_es(par=par, fn=fn, lower=lower);
+        .ignore.errors({ result <- psoptim(par=par, fn=fn, lower=lower) });
       } else {
-        result <- cma_es(par=par, fn=fn, lower=lower, upper=upper);
+        .ignore.errors({ result <- psoptim(par=par, fn=fn, lower=lower, upper=upper) });
       }
     }
 
-    if(is.null(result)) { return(NULL); }
-    if(!(FunctionalModel.par.check(model, result$par))) { return(NULL); }
-    if(!(learning.checkQuality(result$value))) { return(NULL); }
-    return(FittedFunctionalModel.new(model, result$par, result$value));
+    if((!(is.null(result))) &&
+          FunctionalModel.par.check(model, result$par) &&
+          learning.checkQuality(result$value)) {
+      return(FittedFunctionalModel.new(model, result$par, result$value));
+    }
   });
 
   return(NULL);

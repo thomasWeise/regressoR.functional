@@ -30,7 +30,7 @@ FunctionalModel.fit.minqa <- function(metric, model, par=NULL, q=0.75) {
 
   fn <- function(par) metric@quality(model@f, par);
 
-  limits <- .fix.boundaries(model);
+  limits <- .fix.boundaries(model, par=par);
   if(is.null(limits)) {
     lower <- NULL;
     upper <- NULL;
