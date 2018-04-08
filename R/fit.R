@@ -11,26 +11,32 @@
 
 # the fitters to be used in a normal situation
 .fitters <- c(
-  FunctionalModel.fit.nlslm,
-  FunctionalModel.fit.minqa,
-  FunctionalModel.fit.lbfgsb,
-  FunctionalModel.fit.nls
+  FunctionalModel.fit.nlslm,         #  1L
+  FunctionalModel.fit.minqa,         #  2L
+  FunctionalModel.fit.lbfgsb,        #  3L
+  FunctionalModel.fit.nls,           #  4L
+  FunctionalModel.fit.de,            #  5L
+  FunctionalModel.fit.dfoptim,       #  6L
+  FunctionalModel.fit.cmaes          #  7L
 )
 
-# the indexes of the fitters to use when we have a starting point
-.fitters.for.starting.point     <- 1L:length(.fitters);
-# the indexes of the fitters to use if we do not have a starting point: apply
-# some fitters multiple times for more diversity (as each application gets a
-# different, unique starting point)
-.fitters.without.starting.point <- c(1L, 1L, 1L, 2L, 2L, 3L, 3L, 3L, 4L, 4L, 4L);
+# the sequence in which the fitter set is populated
+#                  1    2    3    4    5
+.fitters.seq <- c( 1L,  2L,  3L,  4L,  1L,
+                   2L,  3L,  3L,  1L,  4L,
+                   4L,  1L,  2L,  3L,  2L,
+                   5L,  1L,  6L,  2L,  7L)
 
-# the list of fitters to use if could not produce any feasible parameterization
-.fitters.fallback <- unlist(c(
-  FunctionalModel.fit.de,
-  FunctionalModel.fit.dfoptim,
-  .fitters,
-  FunctionalModel.fit.cmaes
-))
+.a <- 4
+.b <- -(9L * length(.fitters.seq) - 148L) / 3L
+.c <- (12L * length(.fitters.seq) - 160L) / 3L
+
+# get the list of fitters for the given situation
+.fitters.get <- function(q, hasStart) {
+  if(hasStart) q <- q * q;
+  .fitters.seq[1L:as.integer(max(4, ceiling(.a + .b*q + .c*q*q)))];
+}
+
 
 #' @title Fit the Given Model Blueprint to the Specified Data
 #'
@@ -52,21 +58,23 @@ FunctionalModel.fit <- function(metric, model, par=NULL, q=0.75) {
   #  is the input data valid?
   if(is.null(metric) || is.null(model)) { return(NULL); }
 
+  # get the fitters to use for this setup
   if(is.null(par)) {
-    # We have no starting point, so we want to try some of the fitters several
-    # times to get a more robust answer
-    fitters <- .fitters.without.starting.point;
+    qt <- q;
   } else {
-    # We have a starting point, so apply each of the default fitters only once.
-    fitters <- .fitters.for.starting.point;
+    # if a starting point is provided, tend to use fewer fitters
+    qt <- q*q;
   }
+  fitters <- .fitters.seq[1L:as.integer(max(4, ceiling(.a + .b*qt + .c*qt*qt)))];
+  # choose the fitters that can re-tried in a refinement step
+  refine  <- max(3L, as.integer(3L + (((q - 0.75)/0.25)*(length(.fitters) - 2.5))));
 
   # Create an initial population of several candidate vectors which each are
   # slightly different from each other. This brings some diversity and makes
   # sure that each fitter starts at a slightly different point. Thus, we can
   # maybe avoid landing in a bad local optimum.
   candidates <- .make.initial.pop(par, metric@x, metric@y, length(fitters), model);
-  best <- NULL;
+  best       <- NULL;
   # Apply all the fitters and record their fitting qualities.
   qualities  <- vapply(X=fitters,
                        FUN=function(i, env) {
@@ -81,16 +89,17 @@ FunctionalModel.fit <- function(metric, model, par=NULL, q=0.75) {
                            assign(x="best", value=result, pos=env);
                          }
 
-                         # We will not allow nls a second chance because it is
-                         # generally a bad method.
-                         if(i < 4){ return(result@quality); }
-                         return(+Inf);
+                         # We only consider the fitters that can be used in a refinement step
+                         # for refinement, the others will be ignored by setting their quality
+                         # to -Inf, which means that they already "saw" the best result.
+                         if(i <= refine) return(result@quality);
+                         return(-Inf);
                        }, FUN.VALUE=+Inf, env=environment());
 
-  if(is.null(best)) {
+  if(is.null(best) && (q > 0.6)) {
     # OK, if we get here, all the standard fitters have failed. We now try other
-    # methods to compensate, but these methods may be slow
-    for(fitter in .fitters.fallback) {
+    # methods to compensate, but these methods may be slow.
+    for(fitter in .fitters) {
       best <- fitter(metric=metric, model=model);
       if(!(is.null(best))) {
         # if we find a solution, we can immediately stop and try to refine it
