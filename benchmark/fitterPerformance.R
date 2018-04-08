@@ -33,7 +33,7 @@ x.max        <- 5;
 
 cat("### Compare the Performance of the Different Function Fitters ###\n");
 
-methods.names <- c("nlslm", "minqa", "cmaes", "de", "dfoptim", "nls", "lbfgsb");
+methods.names <- c("nlslm", "minqa", "cmaes", "de", "dfoptim", "nls", "lbfgsb", "pso");
 cat("       ", length(methods.names), "  methods: ", paste(methods.names, collapse=", "), "\n", sep="");
 cat(" mininum data size: ", minDataSize, "\n", sep="");
 cat(" maximum data size: ", maxDataSize, "\n", sep="");
