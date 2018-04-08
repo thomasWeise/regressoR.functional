@@ -1,7 +1,7 @@
 Package: regressoR.functional
 Type: Package
 Title: An R Package for Fitting Functional Models to 2-Dimensional Data
-Version: 0.8.6
+Version: 0.8.7
 Author: Dr. Thomas Weise <tweise@hfuu.edu.cn>
 Maintainer: Dr. Thomas Weise <tweise@hfuu.edu.cn>
 Description: This package provides methods for fitting a functional model
@@ -15,7 +15,7 @@ LazyData: true
 URL: http://www.github.com/thomasWeise/regressoR.functional
 BugReports: http://www.github.com/thomasWeise/regressoR.functional/issues
 Imports: cmaes (>= 1.0.11),
-         dataTransformeR (>= 0.8.9),
+         dataTransformeR (>= 0.8.10),
          DEoptim (>= 2.2.4),
          dfoptim (>= 2017.12.1),
          functionComposeR (>= 0.8.8),
@@ -39,6 +39,7 @@ Remotes: github::thomasWeise/dataTransformeR,
 Collate: 
     'FittedFunctionalModel.R'
     'TransformedFittedFunctionalModel.R'
+    'asCharacter.R'
     'tools.R'
     'utils.R'
     'cmaes.R'
