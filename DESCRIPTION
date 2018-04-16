@@ -27,7 +27,8 @@ Imports: cmaes (>= 1.0.11),
          regressoR.base (>= 0.8.4),
          regressoR.functional.models (>= 0.8.11),
          regressoR.quality (>= 0.8.4),
-         stats (>= 3.3.2)
+         stats (>= 3.3.2),
+         utilizeR (>= 0.8.1)
 Suggests: testthat (>= 2.0.0),
           roxygen2 (>= 6.0.1)
 Remotes: github::thomasWeise/dataTransformeR,
@@ -35,7 +36,8 @@ Remotes: github::thomasWeise/dataTransformeR,
          github::thomasWeise/learnerSelectoR,
          github::thomasWeise/regressoR.base,
          github::thomasWeise/regressoR.functional.models,
-         github::thomasWeise/regressoR.quality
+         github::thomasWeise/regressoR.quality,
+         github::thomasWeise/utilizeR
 Collate: 
     'FittedFunctionalModel.R'
     'TransformedFittedFunctionalModel.R'
