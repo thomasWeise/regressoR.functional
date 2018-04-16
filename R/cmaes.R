@@ -1,5 +1,4 @@
 #' @include FittedFunctionalModel.R
-#' @include utils.R
 #' @include tools.R
 
 #' @title Use CMA-ES to Optimize the Parameters
@@ -21,6 +20,7 @@
 #' @importFrom regressoR.functional.models FunctionalModel.par.estimate
 #'   FunctionalModel.par.check
 #' @export FunctionalModel.fit.cmaes
+#' @importFrom utilizeR ignoreErrors
 FunctionalModel.fit.cmaes <- function(metric, model, par=NULL, q=0.75) {
   if(is.null(metric) || is.null(model) ) { return(NULL); }
 
@@ -39,7 +39,7 @@ FunctionalModel.fit.cmaes <- function(metric, model, par=NULL, q=0.75) {
     upper <- limits$upper;
   }
 
-  .ignore.errors({
+  ignoreErrors({
     if(is.null(lower)) {
       if(is.null(upper)) {
         result <- cma_es(par=par, fn=fn);

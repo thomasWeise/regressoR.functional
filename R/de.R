@@ -1,4 +1,3 @@
-#' @include utils.R
 #' @include FittedFunctionalModel.R
 
 # compute the population size for DE based on the effort parameter q and the
@@ -31,6 +30,7 @@
 #' @importFrom regressoR.functional.models FunctionalModel.par.estimate
 #'   FunctionalModel.par.check
 #' @export FunctionalModel.fit.de
+#' @importFrom utilizeR ignoreErrors
 FunctionalModel.fit.de <- function(metric, model, par=NULL, q=0.75) {
   if(is.null(metric) || is.null(model) ) { return(NULL); }
 
@@ -47,7 +47,7 @@ FunctionalModel.fit.de <- function(metric, model, par=NULL, q=0.75) {
 
   NP <- .de.ps(q=q, n=model@paramCount);
 
-  .ignore.errors({
+  ignoreErrors({
     initialPop <- .make.initial.pop(par, metric@x, metric@y, NP, model);
 
     if(is.null(lower)) {

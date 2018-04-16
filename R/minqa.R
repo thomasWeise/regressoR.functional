@@ -1,5 +1,4 @@
 #' @include FittedFunctionalModel.R
-#' @include utils.R
 #' @include tools.R
 
 #' @title Use Powell's BOBYQA Approach to Optimize the Parameters
@@ -39,10 +38,10 @@ FunctionalModel.fit.minqa <- function(metric, model, par=NULL, q=0.75) {
     upper <- limits$upper;
   }
 
-  .ignore.errors({
+  ignoreErrors({
     result <- NULL;
 
-    .ignore.errors({
+    ignoreErrors({
       if(is.null(lower)) {
         if(is.null(upper)) {
           result <- bobyqa(par=par, fn=fn);

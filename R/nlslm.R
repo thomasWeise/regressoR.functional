@@ -1,5 +1,4 @@
 #' @include FittedFunctionalModel.R
-#' @include utils.R
 #' @include tools.R
 
 #' @title Apply a Levenberg-Marquardt Algorithm to Fit a Functional Model
@@ -47,7 +46,7 @@ FunctionalModel.fit.nlslm <- function(metric, model, par=NULL, q=0.75) {
     upper <- limits$upper;
   }
 
-  .ignore.errors({
+  ignoreErrors({
     result <- nls.lm(par=par, lower=lower, upper=upper, fn=fn, jac=jac);
     if(is.null(result)) { return(NULL); }
     if(!(FunctionalModel.par.check(model, result$par))) { return(NULL); }

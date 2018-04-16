@@ -8,7 +8,6 @@
 #' @include optim.R
 #' @include pso.R
 #' @include tools.R
-#' @include utils.R
 
 # the fitters to be used in a normal situation
 .fitters <- c(

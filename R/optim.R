@@ -1,5 +1,4 @@
 #' @include FittedFunctionalModel.R
-#' @include utils.R
 #' @include tools.R
 
 #' @title Use the \code{\link{optim}} Method from the \code{stats} Package for Fitting a Model
@@ -22,6 +21,7 @@
 #'   \code{NULL} on failure.
 #' @importFrom stats optim
 #' @importFrom learnerSelectoR learning.checkQuality
+#' @importFrom utilizeR ignoreErrors
 #' @importClassesFrom regressoR.quality RegressionQualityMetric
 #' @importFrom regressoR.functional.models FunctionalModel.par.estimate
 #'   FunctionalModel.par.check
@@ -46,19 +46,19 @@ FunctionalModel.fit.optim <- function(metric, model, par=NULL, q=0.75, method="L
 
   # for some reason, I cannot get this to work with using a gradient
 
-  .ignore.errors({
+  ignoreErrors({
     result <- NULL;
     if(is.null(lower)) {
       if(is.null(upper)) {
-        .ignore.errors({ result <- optim(par=par, fn=fn, method=method) });
+        ignoreErrors({ result <- optim(par=par, fn=fn, method=method) });
       } else {
-        .ignore.errors({ result <- optim(par=par, fn=fn, upper=upper, method=method) });
+        ignoreErrors({ result <- optim(par=par, fn=fn, upper=upper, method=method) });
       }
     } else {
       if(is.null(upper)) {
-        .ignore.errors({ result <- optim(par=par, fn=fn, lower=lower, method=method) });
+        ignoreErrors({ result <- optim(par=par, fn=fn, lower=lower, method=method) });
       } else {
-        .ignore.errors({ result <- optim(par=par, fn=fn, lower=lower, upper=upper, method=method) });
+        ignoreErrors({ result <- optim(par=par, fn=fn, lower=lower, upper=upper, method=method) });
       }
     }
 

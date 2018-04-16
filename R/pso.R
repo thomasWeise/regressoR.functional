@@ -1,5 +1,4 @@
 #' @include FittedFunctionalModel.R
-#' @include utils.R
 #' @include tools.R
 
 #' @title Use the \code{\link{psoptim}} Method from the \code{pso} Package for
@@ -23,6 +22,7 @@
 #' @importFrom regressoR.functional.models FunctionalModel.par.estimate
 #'   FunctionalModel.par.check
 #' @export FunctionalModel.fit.pso
+#' @importFrom utilizeR ignoreErrors
 FunctionalModel.fit.pso <- function(metric, model, par=NULL, q=0.75) {
   if(is.null(metric) || is.null(model) ) { return(NULL); }
 
@@ -43,19 +43,19 @@ FunctionalModel.fit.pso <- function(metric, model, par=NULL, q=0.75) {
 
   # for some reason, I cannot get this to work with using a gradient
 
-  .ignore.errors({
+  ignoreError({
     result <- NULL;
     if(is.null(lower)) {
       if(is.null(upper)) {
-        .ignore.errors({ result <- psoptim(par=par, fn=fn) });
+        ignoreError({ result <- psoptim(par=par, fn=fn) });
       } else {
-        .ignore.errors({ result <- psoptim(par=par, fn=fn, upper=upper) });
+        ignoreError({ result <- psoptim(par=par, fn=fn, upper=upper) });
       }
     } else {
       if(is.null(upper)) {
-        .ignore.errors({ result <- psoptim(par=par, fn=fn, lower=lower) });
+        ignoreError({ result <- psoptim(par=par, fn=fn, lower=lower) });
       } else {
-        .ignore.errors({ result <- psoptim(par=par, fn=fn, lower=lower, upper=upper) });
+        ignoreError({ result <- psoptim(par=par, fn=fn, lower=lower, upper=upper) });
       }
     }
 

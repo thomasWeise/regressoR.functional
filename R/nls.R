@@ -1,5 +1,4 @@
 #' @include FittedFunctionalModel.R
-#' @include utils.R
 #' @include tools.R
 
 #' @title Apply a the Standard Non-Linear Least Squares Approach from Package
@@ -32,7 +31,7 @@ FunctionalModel.fit.nls <- function(metric, model, par=NULL, q=0.75) {
     par <- FunctionalModel.par.estimate(model, metric@x, metric@y);
   }
 
-  .ignore.errors({
+  ignoreErrors({
     if(is.null(metric@weights)) {
       result <- nls(y ~ model@f(x, par), data=list(x=metric@x, y=metric@y), start=list(par=par));
     } else {

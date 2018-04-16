@@ -1,5 +1,4 @@
 #' @include FittedFunctionalModel.R
-#' @include utils.R
 #' @include tools.R
 
 #' @title Use Derivative-Free Local Searches to Optimize the Parameters
@@ -21,6 +20,7 @@
 #' @importClassesFrom regressoR.quality RegressionQualityMetric
 #' @importFrom regressoR.functional.models FunctionalModel.par.estimate
 #'   FunctionalModel.par.check
+#' @importFrom utilizeR ignoreErrors
 #' @export FunctionalModel.fit.dfoptim
 FunctionalModel.fit.dfoptim <- function(metric, model, par=NULL, q=0.75) {
   if(is.null(metric) || is.null(model) ) { return(NULL); }
@@ -40,25 +40,25 @@ FunctionalModel.fit.dfoptim <- function(metric, model, par=NULL, q=0.75) {
 
   fn <- function(par) metric@quality(model@f, par);
 
-  .ignore.errors({
+  .ignoreErrors({
     control <- list(maxfeval=2000);
     result1 <- NULL;
     result2 <- NULL;
     if(is.null(lower)) {
       if(is.null(upper)) {
-        .ignore.errors({ result1 <- hjk(par=par, fn=fn, control=control) });
-        .ignore.errors({ result2 <- nmk(par=par, fn=fn, control=control) });
+        .ignoreErrors({ result1 <- hjk(par=par, fn=fn, control=control) });
+        .ignoreErrors({ result2 <- nmk(par=par, fn=fn, control=control) });
       } else {
-        .ignore.errors({ result1 <- hjkb(par=par, fn=fn, upper=upper, control=control) });
-        .ignore.errors({ result2 <- nmkb(par=par, fn=fn, upper=upper, control=control) });
+        .ignoreErrors({ result1 <- hjkb(par=par, fn=fn, upper=upper, control=control) });
+        .ignoreErrors({ result2 <- nmkb(par=par, fn=fn, upper=upper, control=control) });
       }
     } else {
       if(is.null(upper)) {
-        .ignore.errors({ result1 <- hjkb(par=par, fn=fn, lower=lower, control=control) });
-        .ignore.errors({ result2 <- nmkb(par=par, fn=fn, lower=lower, control=control) });
+        .ignoreErrors({ result1 <- hjkb(par=par, fn=fn, lower=lower, control=control) });
+        .ignoreErrors({ result2 <- nmkb(par=par, fn=fn, lower=lower, control=control) });
       } else {
-        .ignore.errors({ result1 <- hjkb(par=par, fn=fn, lower=lower, upper=upper, control=control) });
-        .ignore.errors({ result2 <- nmkb(par=par, fn=fn, lower=lower, upper=upper, control=control) });
+        .ignoreErrors({ result1 <- hjkb(par=par, fn=fn, lower=lower, upper=upper, control=control) });
+        .ignoreErrors({ result2 <- nmkb(par=par, fn=fn, lower=lower, upper=upper, control=control) });
       }
     }
 
