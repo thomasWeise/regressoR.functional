@@ -40,25 +40,25 @@ FunctionalModel.fit.dfoptim <- function(metric, model, par=NULL, q=0.75) {
 
   fn <- function(par) metric@quality(model@f, par);
 
-  .ignoreErrors({
+  ignoreErrors({
     control <- list(maxfeval=2000);
     result1 <- NULL;
     result2 <- NULL;
     if(is.null(lower)) {
       if(is.null(upper)) {
-        .ignoreErrors({ result1 <- hjk(par=par, fn=fn, control=control) });
-        .ignoreErrors({ result2 <- nmk(par=par, fn=fn, control=control) });
+        ignoreErrors({ result1 <- hjk(par=par, fn=fn, control=control) });
+        ignoreErrors({ result2 <- nmk(par=par, fn=fn, control=control) });
       } else {
-        .ignoreErrors({ result1 <- hjkb(par=par, fn=fn, upper=upper, control=control) });
-        .ignoreErrors({ result2 <- nmkb(par=par, fn=fn, upper=upper, control=control) });
+        ignoreErrors({ result1 <- hjkb(par=par, fn=fn, upper=upper, control=control) });
+        ignoreErrors({ result2 <- nmkb(par=par, fn=fn, upper=upper, control=control) });
       }
     } else {
       if(is.null(upper)) {
-        .ignoreErrors({ result1 <- hjkb(par=par, fn=fn, lower=lower, control=control) });
-        .ignoreErrors({ result2 <- nmkb(par=par, fn=fn, lower=lower, control=control) });
+        ignoreErrors({ result1 <- hjkb(par=par, fn=fn, lower=lower, control=control) });
+        ignoreErrors({ result2 <- nmkb(par=par, fn=fn, lower=lower, control=control) });
       } else {
-        .ignoreErrors({ result1 <- hjkb(par=par, fn=fn, lower=lower, upper=upper, control=control) });
-        .ignoreErrors({ result2 <- nmkb(par=par, fn=fn, lower=lower, upper=upper, control=control) });
+        ignoreErrors({ result1 <- hjkb(par=par, fn=fn, lower=lower, upper=upper, control=control) });
+        ignoreErrors({ result2 <- nmkb(par=par, fn=fn, lower=lower, upper=upper, control=control) });
       }
     }
 

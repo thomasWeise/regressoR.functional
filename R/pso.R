@@ -43,19 +43,19 @@ FunctionalModel.fit.pso <- function(metric, model, par=NULL, q=0.75) {
 
   # for some reason, I cannot get this to work with using a gradient
 
-  ignoreError({
+  ignoreErrors({
     result <- NULL;
     if(is.null(lower)) {
       if(is.null(upper)) {
-        ignoreError({ result <- psoptim(par=par, fn=fn) });
+        ignoreErrors({ result <- psoptim(par=par, fn=fn) });
       } else {
-        ignoreError({ result <- psoptim(par=par, fn=fn, upper=upper) });
+        ignoreErrors({ result <- psoptim(par=par, fn=fn, upper=upper) });
       }
     } else {
       if(is.null(upper)) {
-        ignoreError({ result <- psoptim(par=par, fn=fn, lower=lower) });
+        ignoreErrors({ result <- psoptim(par=par, fn=fn, lower=lower) });
       } else {
-        ignoreError({ result <- psoptim(par=par, fn=fn, lower=lower, upper=upper) });
+        ignoreErrors({ result <- psoptim(par=par, fn=fn, lower=lower, upper=upper) });
       }
     }
 
