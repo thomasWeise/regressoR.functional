@@ -9,8 +9,8 @@
 #' @param fitter the model fitter to use
 #' @return a list of fitters that can be applied.
 #' @export FunctionalModel.makeLearners
-#' @importFrom regressoR.functional.models FunctionalModel.all
-FunctionalModel.makeLearners <- function(models = FunctionalModel.all(),
+#' @importFrom regressoR.functional.models FunctionalModel.monotonous
+FunctionalModel.makeLearners <- function(models = FunctionalModel.monotonous(),
                                          fitter = FunctionalModel.fit) {
   if(is.null(models) || (!(is.list(models))) || (length(models) <= 0L)) {
     stop("The list of models cannot be empty or NULL.");

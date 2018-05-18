@@ -4,7 +4,7 @@
 \alias{FunctionalModel.makeLearners}
 \title{Create Learners for the Given Set of Models}
 \usage{
-FunctionalModel.makeLearners(models = FunctionalModel.all(),
+FunctionalModel.makeLearners(models = FunctionalModel.monotonous(),
   fitter = FunctionalModel.fit)
 }
 \arguments{

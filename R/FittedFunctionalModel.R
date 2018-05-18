@@ -80,9 +80,12 @@ FittedFunctionalModel.new <- function(model, par, quality) {
 #' @return a \code{\link{FittedFunctionalModel}}
 #' @importFrom functionComposeR function.substitute
 #' @export FittedFunctionalModel.finalize
+#' @importFrom compiler cmpfun
 FittedFunctionalModel.finalize <- function(object) {
   object <- force(object);
   object@f <- function.substitute(object@model@f, list(par=object@par));
+  object@f <- force(object@f);
+  object@f <- cmpfun(object@f, options=list(optimize=3L));
   object@f <- force(object@f);
   return(object);
 }
