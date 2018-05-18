@@ -9,7 +9,7 @@ FunctionalModel.makeLearners(models = FunctionalModel.monotonous(),
 }
 \arguments{
 \item{models}{the set of models to use, by default this is
-\code{\link{FunctionalModel.monotonous}}}
+\code{\link[regressoR.functional.models]{FunctionalModel.monotonous}}}
 
 \item{fitter}{the model fitter to use}
 }
@@ -18,6 +18,5 @@ a list of fitters that can be applied.
 }
 \description{
 Create the learners for the use in
-  \code{\link[regressoR.functional.models]{regressoR.applyLearners}} from a
-  set of models.
+  \code{\link[regressoR.base]{regressoR.applyLearners}} from a set of models.
 }
