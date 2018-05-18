@@ -3,9 +3,10 @@
 
 #' @title Create Learners for the Given Set of Models
 #' @description Create the learners for the use in
-#'   \code{\link{regressoR.applyLearners}} from a set of models.
+#'   \code{\link[regressoR.functional.models]{regressoR.applyLearners}} from a
+#'   set of models.
 #' @param models the set of models to use, by default this is
-#'   \code{\link{FunctionalModel.all}}
+#'   \code{\link{FunctionalModel.monotonous}}
 #' @param fitter the model fitter to use
 #' @return a list of fitters that can be applied.
 #' @export FunctionalModel.makeLearners
