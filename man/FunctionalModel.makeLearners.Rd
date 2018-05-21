@@ -4,12 +4,12 @@
 \alias{FunctionalModel.makeLearners}
 \title{Create Learners for the Given Set of Models}
 \usage{
-FunctionalModel.makeLearners(models = FunctionalModel.monotonous(),
+FunctionalModel.makeLearners(models = FunctionalModel.default(),
   fitter = FunctionalModel.fit)
 }
 \arguments{
 \item{models}{the set of models to use, by default this is
-\code{\link[regressoR.functional.models]{FunctionalModel.monotonous}}}
+\code{\link[regressoR.functional.models]{FunctionalModel.default}}}
 
 \item{fitter}{the model fitter to use}
 }

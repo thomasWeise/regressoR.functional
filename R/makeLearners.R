@@ -1,16 +1,15 @@
 #' @include fitTransformed.R
 
-
 #' @title Create Learners for the Given Set of Models
 #' @description Create the learners for the use in
 #'   \code{\link[regressoR.base]{regressoR.applyLearners}} from a set of models.
 #' @param models the set of models to use, by default this is
-#'   \code{\link[regressoR.functional.models]{FunctionalModel.monotonous}}
+#'   \code{\link[regressoR.functional.models]{FunctionalModel.default}}
 #' @param fitter the model fitter to use
 #' @return a list of fitters that can be applied.
 #' @export FunctionalModel.makeLearners
-#' @importFrom regressoR.functional.models FunctionalModel.monotonous
-FunctionalModel.makeLearners <- function(models = FunctionalModel.monotonous(),
+#' @importFrom regressoR.functional.models FunctionalModel.default
+FunctionalModel.makeLearners <- function(models = FunctionalModel.default(),
                                          fitter = FunctionalModel.fit) {
   if(is.null(models) || (!(is.list(models))) || (length(models) <= 0L)) {
     stop("The list of models cannot be empty or NULL.");

@@ -32,7 +32,7 @@ TransformedFittedFunctionalModel <- setClass(
     }
     if((length(transform.x.args) != 1L) ||
        (!(identical(names(transform.x.args), c("x"))))) {
-      return("transform.x function must have at exactly argument named 'x'.");
+      return("transform.x function must have at exactly one argument named 'x'.");
     }
 
     # check transform.y function
@@ -47,7 +47,7 @@ TransformedFittedFunctionalModel <- setClass(
     }
     if((length(transform.y.args) != 1L) ||
        (!(identical(names(transform.y.args), c("x"))))) {
-      return("transform.y function must have at exactly argument named 'x'.");
+      return("transform.y function must have at exactly one argument named 'x'.");
     }
 
     return(TRUE);
@@ -174,16 +174,16 @@ TransformedFittedFunctionalModel.finalize <- function(object) {
                                 quality=object@quality)));
   }
 
-  f <- functionComposeR::function.substitute(object@model@f, list(par=object@par));
+  f <- function.substitute(object@model@f, list(par=object@par));
 
   if(!(x.i.i)) {
     # transform.x is not the identity transformation
-    f <- functionComposeR::function.compose(f=object@transform.x, g=f, f2g="x");
+    f <- function.compose(f=object@transform.x, g=f, f2g="x");
   }
 
   if(!(y.i.i)) {
     # transform.y is not the identity transformation
-    f <- functionComposeR::function.compose(f=f, g=object@transform.y, f2g="x");
+    f <- function.compose(f=f, g=object@transform.y, f2g="x");
   }
 
   object@f <- f;

@@ -1,7 +1,7 @@
 Package: regressoR.functional
 Type: Package
 Title: An R Package for Fitting Functional Models to 2-Dimensional Data
-Version: 0.8.8
+Version: 0.8.9
 Author: Dr. Thomas Weise <tweise@hfuu.edu.cn>
 Maintainer: Dr. Thomas Weise <tweise@hfuu.edu.cn>
 Description: This package provides methods for fitting a functional model
@@ -47,13 +47,14 @@ Collate:
     'tools.R'
     'cmaes.R'
     'de.R'
-    'dfoptim.R'
     'pso.R'
     'optim.R'
     'nls.R'
+    'dfoptim.R'
     'nlslm.R'
     'minqa.R'
     'fit.R'
     'fitTransformed.R'
     'makeLearners.R'
+    'defaultLearners.R'
 RoxygenNote: 6.0.1.9000

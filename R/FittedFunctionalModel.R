@@ -20,7 +20,7 @@ FittedFunctionalModel <- setClass(
   Class = "FittedFunctionalModel",
   contains = "FittedModel",
   representation = representation(model="FunctionalModel",
-                                           par="numeric"),
+                                  par="numeric"),
   validity = function(object) {
     if (is.null(object@model) ||
        (!(is(object@model, "FunctionalModel")))) {
@@ -59,8 +59,8 @@ FittedFunctionalModel.new <- function(model, par, quality) {
   fn <- function(x) f(x, par);
 
   result <- new("FittedFunctionalModel",
-                         model=model, par=par, quality=quality, f=fn,
-                         size=model@paramCount);
+                model=model, par=par, quality=quality, f=fn,
+                size=model@paramCount);
   result <- force(result);
   result@par <- force(result@par);
   result@f <- force(result@f);
