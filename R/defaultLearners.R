@@ -28,7 +28,7 @@ FunctionalModel.defaultLearners <- function() {
 #' @return a list of default learners for models representing monotonously
 #'   decreasing functions that can be applied in
 #'   \code{\link[regressoR.base]{regressoR.applyLearners}}.
-#' @export FunctionalModel.defaultLearners
+#' @export FunctionalModel.monotonousLearners
 #' @seealso FunctionalModel.makeLearners
 FunctionalModel.monotonousLearners <- function() {
   return(.default);
