@@ -13,6 +13,7 @@
 #'   the blueprint function
 #' @exportClass TransformedFittedFunctionalModel
 #' @importFrom methods setClass representation
+#' @importFrom utilizeR function.args
 #' @seealso TransformedFittedFunctionalModel.new
 TransformedFittedFunctionalModel <- setClass(
   Class = "TransformedFittedFunctionalModel",
@@ -25,13 +26,7 @@ TransformedFittedFunctionalModel <- setClass(
        (!(is.function(object@transform.x)))) {
       return("transform.x function must be defined.");
     }
-    if(is.primitive(object@transform.x)) {
-      transform.x.args <- formals(args(object@transform.x));
-    } else {
-      transform.x.args <- formals(object@transform.x);
-    }
-    if((length(transform.x.args) != 1L) ||
-       (!(identical(names(transform.x.args), c("x"))))) {
+    if(!(identical(function.args(object@transform.x), c("x")))) {
       return("transform.x function must have at exactly one argument named 'x'.");
     }
 
@@ -40,13 +35,7 @@ TransformedFittedFunctionalModel <- setClass(
        (!(is.function(object@transform.y)))) {
       return("transform.y function must be defined.");
     }
-    if(is.primitive(object@transform.y)) {
-      transform.y.args <- formals(args(object@transform.y));
-    } else {
-      transform.y.args <- formals(object@transform.y);
-    }
-    if((length(transform.y.args) != 1L) ||
-       (!(identical(names(transform.y.args), c("x"))))) {
+    if(!(identical(function.args(object@transform.y), c("x")))) {
       return("transform.y function must have at exactly one argument named 'x'.");
     }
 

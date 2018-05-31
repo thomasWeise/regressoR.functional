@@ -1,7 +1,7 @@
 Package: regressoR.functional
 Type: Package
 Title: An R Package for Fitting Functional Models to 2-Dimensional Data
-Version: 0.8.9
+Version: 0.8.10
 Author: Dr. Thomas Weise <tweise@hfuu.edu.cn>
 Maintainer: Dr. Thomas Weise <tweise@hfuu.edu.cn>
 Description: This package provides methods for fitting a functional model
@@ -16,20 +16,20 @@ URL: http://www.github.com/thomasWeise/regressoR.functional
 BugReports: http://www.github.com/thomasWeise/regressoR.functional/issues
 Imports: cmaes (>= 1.0.11),
          compiler (>= 3.3.2),
-         dataTransformeR (>= 0.8.10),
+         dataTransformeR (>= 0.8.11),
          DEoptim (>= 2.2.4),
          dfoptim (>= 2017.12.1),
-         functionComposeR (>= 0.8.8),
-         learnerSelectoR (>= 0.8.6),
+         functionComposeR (>= 0.8.10),
+         learnerSelectoR (>= 0.8.7),
          minpack.lm (>= 1.2.1),
          minqa (>= 1.2.4),
          methods (>= 3.3.2),
          pso (>= 1.0.3),
-         regressoR.base (>= 0.8.4),
-         regressoR.functional.models (>= 0.8.14),
-         regressoR.quality (>= 0.8.4),
+         regressoR.base (>= 0.8.8),
+         regressoR.functional.models (>= 0.8.15),
+         regressoR.quality (>= 0.8.5),
          stats (>= 3.3.2),
-         utilizeR (>= 0.8.1)
+         utilizeR (>= 0.8.4)
 Suggests: testthat (>= 2.0.0),
           roxygen2 (>= 6.0.1)
 Depends: R (>= 3.3.0)
